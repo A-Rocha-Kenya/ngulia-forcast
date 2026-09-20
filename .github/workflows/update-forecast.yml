@@ -1,0 +1,83 @@
+name: Update catch forecast
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "data/**"
+      - "scripts/**"
+      - "site/index.html"
+      - "site/app.js"
+      - "site/styles.css"
+      - "site/favicon.svg"
+      - "DESCRIPTION"
+      - ".github/workflows/update-forecast.yml"
+  schedule:
+    - cron: "17 3,15 15-31 10 *"
+    - cron: "17 3,15 * 11-12 *"
+    - cron: "17 3,15 1-15 1 *"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ngulia-forecast-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::cli, any::dplyr, any::jsonlite, any::lubridate, any::mgcv, any::readr, any::tibble, any::tidyr
+
+      - name: Train forecast model
+        run: Rscript scripts/train_model.R
+
+      - name: Fetch weather and predict
+        run: Rscript scripts/update_forecast.R
+
+      - name: Archive issued forecast
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          stamp=$(date -u +'%Y%m%dT%H%M%SZ')
+          mkdir -p forecast-archive
+          cp site/data/forecast.json "forecast-archive/${stamp}.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data/forecast.json forecast-archive
+          git diff --cached --quiet || git commit -m "Archive forecast ${stamp}"
+          git push
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

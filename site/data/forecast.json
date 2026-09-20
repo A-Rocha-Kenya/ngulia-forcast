@@ -1,0 +1,154 @@
+{
+  "generated_at": "2026-09-20T18:27:48Z",
+  "source": {
+    "provider": "Open-Meteo",
+    "model": "ECMWF IFS 0.25°",
+    "endpoint": "https://api.open-meteo.com/v1/ecmwf",
+    "latitude": -3.0142,
+    "longitude": 38.2109,
+    "timezone": "Africa/Nairobi"
+  },
+  "model": {
+    "n_dates": 1242,
+    "n_seasons": 55,
+    "first_date": "1969-12-11",
+    "last_date": "2023-12-18",
+    "version": "0.1.0",
+    "response": "Relative positive-catch opportunity conditional on operation",
+    "reference_index": 100
+  },
+  "status": {
+    "in_season": false,
+    "next_season_start": "2026-10-20",
+    "forecast_dates_in_season": 0
+  },
+  "forecast": [],
+  "timing_outlook": [
+    {
+      "date": "2026-10-20",
+      "baseline_index": 1.4,
+      "moon_distance_from_new_moon": 9,
+      "moon_days_from_new_moon": 9.1
+    },
+    {
+      "date": "2026-10-21",
+      "baseline_index": 1.3,
+      "moon_distance_from_new_moon": 10,
+      "moon_days_from_new_moon": 10.1
+    },
+    {
+      "date": "2026-10-22",
+      "baseline_index": 1.2,
+      "moon_distance_from_new_moon": 11,
+      "moon_days_from_new_moon": 11.1
+    },
+    {
+      "date": "2026-10-23",
+      "baseline_index": 1,
+      "moon_distance_from_new_moon": 12,
+      "moon_days_from_new_moon": 12.1
+    },
+    {
+      "date": "2026-10-24",
+      "baseline_index": 0.8,
+      "moon_distance_from_new_moon": 13,
+      "moon_days_from_new_moon": 13.1
+    },
+    {
+      "date": "2026-10-25",
+      "baseline_index": 0.6,
+      "moon_distance_from_new_moon": 14,
+      "moon_days_from_new_moon": 14.1
+    },
+    {
+      "date": "2026-10-26",
+      "baseline_index": 0.7,
+      "moon_distance_from_new_moon": 14,
+      "moon_days_from_new_moon": -14.4
+    },
+    {
+      "date": "2026-10-27",
+      "baseline_index": 1.2,
+      "moon_distance_from_new_moon": 13,
+      "moon_days_from_new_moon": -13.4
+    },
+    {
+      "date": "2026-10-28",
+      "baseline_index": 1.9,
+      "moon_distance_from_new_moon": 12,
+      "moon_days_from_new_moon": -12.4
+    },
+    {
+      "date": "2026-10-29",
+      "baseline_index": 3,
+      "moon_distance_from_new_moon": 11,
+      "moon_days_from_new_moon": -11.4
+    },
+    {
+      "date": "2026-10-30",
+      "baseline_index": 4.5,
+      "moon_distance_from_new_moon": 10,
+      "moon_days_from_new_moon": -10.4
+    },
+    {
+      "date": "2026-10-31",
+      "baseline_index": 6.2,
+      "moon_distance_from_new_moon": 9,
+      "moon_days_from_new_moon": -9.4
+    },
+    {
+      "date": "2026-11-01",
+      "baseline_index": 8.2,
+      "moon_distance_from_new_moon": 8,
+      "moon_days_from_new_moon": -8.4
+    },
+    {
+      "date": "2026-11-02",
+      "baseline_index": 10.6,
+      "moon_distance_from_new_moon": 7,
+      "moon_days_from_new_moon": -7.4
+    },
+    {
+      "date": "2026-11-03",
+      "baseline_index": 13.3,
+      "moon_distance_from_new_moon": 6,
+      "moon_days_from_new_moon": -6.4
+    },
+    {
+      "date": "2026-11-04",
+      "baseline_index": 16.7,
+      "moon_distance_from_new_moon": 5,
+      "moon_days_from_new_moon": -5.4
+    },
+    {
+      "date": "2026-11-05",
+      "baseline_index": 20.9,
+      "moon_distance_from_new_moon": 4,
+      "moon_days_from_new_moon": -4.4
+    },
+    {
+      "date": "2026-11-06",
+      "baseline_index": 25.9,
+      "moon_distance_from_new_moon": 3,
+      "moon_days_from_new_moon": -3.4
+    },
+    {
+      "date": "2026-11-07",
+      "baseline_index": 31.6,
+      "moon_distance_from_new_moon": 2,
+      "moon_days_from_new_moon": -2.4
+    },
+    {
+      "date": "2026-11-08",
+      "baseline_index": 37.9,
+      "moon_distance_from_new_moon": 1,
+      "moon_days_from_new_moon": -1.4
+    },
+    {
+      "date": "2026-11-09",
+      "baseline_index": 44.9,
+      "moon_distance_from_new_moon": 0,
+      "moon_days_from_new_moon": -0.4
+    }
+  ]
+}

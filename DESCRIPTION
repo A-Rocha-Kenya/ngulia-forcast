@@ -1,0 +1,18 @@
+Package: nguliaforcast
+Title: Ngulia Daily Catch Forecast
+Version: 0.1.0
+Authors@R: person("Ngulia Ringing Project", role = c("aut", "cre"), email = "info@example.org")
+Description: Trains the Ngulia daily catch opportunity model, retrieves ECMWF
+    forecasts from Open-Meteo, and builds the static forecast data used by the
+    project website.
+License: CC BY 4.0
+Encoding: UTF-8
+Imports:
+    cli,
+    dplyr,
+    jsonlite,
+    lubridate,
+    mgcv,
+    readr,
+    tibble,
+    tidyr

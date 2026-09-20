@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#071117">
+    <meta name="description" content="Daily weather-adjusted catch opportunity for the Ngulia ringing season.">
+    <title>Ngulia catch forecast</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Ngulia catch forecast home">
+        <span class="brand-mark" aria-hidden="true">N</span>
+        <span>
+          <strong>Ngulia</strong>
+          <small>catch forecast</small>
+        </span>
+      </a>
+      <div class="update-state">
+        <span class="pulse" aria-hidden="true"></span>
+        <span id="update-label">Loading forecast…</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="forecast-head" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Tsavo West · Kenya</p>
+          <h1 id="page-title">Tonight at Ngulia</h1>
+          <p class="intro">Weather-adjusted opportunity for planning the ringing night.</p>
+        </div>
+        <div class="season-chip" id="season-chip">Checking season</div>
+      </section>
+
+      <section id="primary-panel" class="primary-panel loading" aria-live="polite">
+        <div class="score-block">
+          <p class="panel-label" id="primary-date">Current outlook</p>
+          <div class="score-line">
+            <span class="score" id="primary-score">—</span>
+            <span class="score-unit">opportunity</span>
+          </div>
+          <p class="score-context" id="score-context">100 is the historical average positive-catch opportunity.</p>
+        </div>
+        <div class="conditions" id="conditions"></div>
+      </section>
+
+      <section class="section" aria-labelledby="outlook-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Planning window</p>
+            <h2 id="outlook-title">15-day outlook</h2>
+          </div>
+          <div class="legend" aria-label="Chart legend">
+            <span><i class="legend-weather"></i> Weather-adjusted</span>
+            <span><i class="legend-baseline"></i> Date + moon</span>
+          </div>
+        </div>
+        <div id="forecast-empty" class="empty-state" hidden></div>
+        <div id="forecast-chart" class="forecast-chart" role="list"></div>
+      </section>
+
+      <section class="section timing-section" aria-labelledby="timing-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Before weather enters range</p>
+            <h2 id="timing-title">Season timing outlook</h2>
+          </div>
+          <p class="section-note">Date and moon only</p>
+        </div>
+        <div id="timing-strip" class="timing-strip" role="list"></div>
+      </section>
+
+      <section class="method-grid" aria-label="Forecast interpretation">
+        <article>
+          <p class="eyebrow">Use it for</p>
+          <h2>Preparation, not promises</h2>
+          <p>Higher scores indicate dates historically associated with stronger catches under comparable local weather. They can support staffing and equipment planning.</p>
+        </article>
+        <article>
+          <p class="eyebrow">What the score means</p>
+          <h2>Conditional opportunity</h2>
+          <p>The model assumes ringing takes place. Lighting, nets, playback, team size and passage conditions beyond Ngulia can still dominate the result.</p>
+        </article>
+        <article>
+          <p class="eyebrow">Forecast source</p>
+          <h2>ECMWF through Open-Meteo</h2>
+          <p>Hourly forecasts are summarized for 00:00–08:00 East Africa Time. Confidence naturally falls with forecast lead.</p>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <p>Ngulia Ringing Project · A weather-adjusted planning tool</p>
+      <a href="https://github.com/A-Rocha-Kenya/ngulia-forcast">Source and method</a>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
+
