@@ -1,96 +1,184 @@
-const number = new Intl.NumberFormat("en", { maximumFractionDigits: 0 });
+const whole = new Intl.NumberFormat("en", { maximumFractionDigits: 0 });
 const oneDecimal = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
-const shortDate = new Intl.DateTimeFormat("en", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+const weekday = new Intl.DateTimeFormat("en", { weekday: "short", timeZone: "UTC" });
+const dayMonth = new Intl.DateTimeFormat("en", { day: "numeric", month: "short", timeZone: "UTC" });
 const longDate = new Intl.DateTimeFormat("en", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+const monthName = new Intl.DateTimeFormat("en", { month: "short", timeZone: "UTC" });
+const demoMode = new URLSearchParams(window.location.search).get("demo") === "1";
 
 const parseDate = value => new Date(`${value}T12:00:00Z`);
-const moonLabel = distance => distance <= 1 ? "new moon" : `${number.format(distance)} d from new moon`;
-const reliabilityLabel = value => `${value[0].toUpperCase()}${value.slice(1)} confidence`;
 
-function setPrimary(day) {
-  const panel = document.querySelector("#primary-panel");
-  panel.classList.remove("loading");
-
-  if (!day) {
-    document.querySelector("#primary-date").textContent = "Outside the live forecast window";
-    document.querySelector("#primary-score").textContent = "—";
-    document.querySelector("#score-context").textContent = "Weather-adjusted scores appear when the ringing season enters the 15-day forecast range.";
-    document.querySelector("#conditions").innerHTML = `
-      <div class="condition"><span>Next update</span><strong>Twice daily</strong></div>
-      <div class="condition"><span>Forecast window</span><strong>15 days</strong></div>
-      <div class="condition"><span>Night period</span><strong>00–08 EAT</strong></div>`;
-    return;
-  }
-
-  document.querySelector("#primary-date").textContent = longDate.format(parseDate(day.date));
-  document.querySelector("#primary-score").textContent = number.format(day.opportunity_index);
-  const direction = day.weather_adjustment_pct >= 0 ? "above" : "below";
-  document.querySelector("#score-context").textContent = `${number.format(Math.abs(day.weather_adjustment_pct))}% ${direction} the date-and-moon baseline · ${reliabilityLabel(day.reliability)}.`;
-  document.querySelector("#conditions").innerHTML = `
-    <div class="condition"><span>Rain 00–08</span><strong>${oneDecimal.format(day.total_precipitation_00_08_mm)} mm</strong></div>
-    <div class="condition"><span>Low cloud</span><strong>${number.format(day.low_cloud_cover_mean_pct)}%</strong></div>
-    <div class="condition"><span>Humidity</span><strong>${number.format(day.relative_humidity_mean_pct)}%</strong></div>
-    <div class="condition"><span>Wind</span><strong>${oneDecimal.format(day.wind_speed_10m_mean_ms)} m/s</strong></div>
-    <div class="condition"><span>Temperature</span><strong>${oneDecimal.format(day.temperature_2m_mean_c)}°C</strong></div>
-    <div class="condition"><span>Moon</span><strong>${moonLabel(day.moon_distance_from_new_moon)}</strong></div>`;
+function moonPhase(signedDays) {
+  const distance = Math.abs(signedDays);
+  if (distance <= 1.5) return { icon: "🌑", label: "New moon" };
+  if (distance >= 13.5) return { icon: "🌕", label: "Full moon" };
+  if (signedDays > 9.5) return { icon: "🌔", label: "Waxing gibbous" };
+  if (signedDays > 5.5) return { icon: "🌓", label: "First quarter" };
+  if (signedDays > 0) return { icon: "🌒", label: "Waxing crescent" };
+  if (signedDays < -9.5) return { icon: "🌖", label: "Waning gibbous" };
+  if (signedDays < -5.5) return { icon: "🌗", label: "Last quarter" };
+  return { icon: "🌘", label: "Waning crescent" };
 }
 
-function renderForecast(days, nextSeasonStart) {
-  const chart = document.querySelector("#forecast-chart");
-  const empty = document.querySelector("#forecast-empty");
+function moonSymbol(signedDays) {
+  const radius = 22;
+  const centre = 25;
+  const phaseAngle = signedDays >= 0
+    ? Math.min(Math.PI, signedDays / 14.765 * Math.PI)
+    : 2 * Math.PI - Math.min(Math.PI, Math.abs(signedDays) / 14.765 * Math.PI);
+  const waxing = phaseAngle <= Math.PI;
+  const distanceFromNew = waxing ? phaseAngle : 2 * Math.PI - phaseAngle;
+  const terminatorFactor = Math.cos(distanceFromNew);
+  const terminator = [];
+  const limb = [];
 
-  if (!days.length) {
-    chart.hidden = true;
-    empty.hidden = false;
-    empty.textContent = `The next ringing season begins ${longDate.format(parseDate(nextSeasonStart))}. Live weather scores will appear when it enters the ECMWF forecast window.`;
+  for (let i = 0; i <= 28; i += 1) {
+    const localY = -radius + 2 * radius * i / 28;
+    const halfWidth = Math.sqrt(Math.max(0, radius * radius - localY * localY));
+    const terminatorX = waxing ? terminatorFactor * halfWidth : -terminatorFactor * halfWidth;
+    terminator.push([centre + terminatorX, centre + localY]);
+    limb.push([centre + (waxing ? halfWidth : -halfWidth), centre + localY]);
+  }
+
+  const points = [...terminator, ...limb.reverse()];
+  const path = points.map(([x, y], index) => `${index ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`).join(" ") + " Z";
+  return `<svg viewBox="0 0 50 50" role="img" aria-label="${moonPhase(signedDays).label}">
+    <circle class="moon-disc" cx="25" cy="25" r="22"></circle>
+    <path class="moon-light" d="${path}"></path>
+    <circle class="moon-outline" cx="25" cy="25" r="22"></circle>
+  </svg>`;
+}
+
+function weatherMarkup(day) {
+  const items = [
+    ["Rain 00–08", `${oneDecimal.format(day.total_precipitation_00_08_mm)} mm`],
+    ["Low cloud", `${whole.format(day.low_cloud_cover_mean_pct)}%`],
+    ["Humidity", `${whole.format(day.relative_humidity_mean_pct)}%`],
+    ["Wind", `${oneDecimal.format(day.wind_speed_10m_mean_ms)} m/s`],
+    ["Temperature", `${oneDecimal.format(day.temperature_2m_mean_c)}°C`],
+    ["Pressure", `${whole.format(day.surface_pressure_mean_hpa)} hPa`]
+  ];
+  return items.map(([label, value]) => `<div class="weather-item"><span>${label}</span><strong>${value}</strong></div>`).join("");
+}
+
+function setLive(day) {
+  if (!day) {
+    document.querySelector("#primary-date").textContent = "Outside the forecast window";
+    document.querySelector("#primary-catch").textContent = "—";
+    document.querySelector("#catch-range").textContent = "Live predictions begin 15 days before the season.";
+    document.querySelector("#catch-context").textContent = "";
+    document.querySelector("#moon-phase").textContent = "—";
+    document.querySelector("#mist-value").textContent = "—";
+    document.querySelector("#weather-grid").innerHTML = "";
     return;
   }
 
-  const maxScore = Math.max(160, ...days.flatMap(day => [day.opportunity_index, day.baseline_index]));
-  chart.innerHTML = days.map(day => {
-    const weatherHeight = Math.max(4, 100 * day.opportunity_index / maxScore);
-    const baselineHeight = Math.max(4, 100 * day.baseline_index / maxScore);
-    return `<article class="forecast-day" role="listitem" title="${reliabilityLabel(day.reliability)}">
-      <div class="date">${shortDate.format(parseDate(day.date))}</div>
-      <div class="bar-stage">
-        <div class="bar baseline" style="height:${baselineHeight}%"></div>
-        <div class="bar weather" style="height:${weatherHeight}%"></div>
+  const phase = moonPhase(day.moon_days_from_new_moon);
+  document.querySelector("#primary-date").textContent = longDate.format(parseDate(day.date));
+  document.querySelector("#primary-catch").textContent = whole.format(day.expected_catch);
+  document.querySelector("#catch-range").textContent = `Likely range ${whole.format(day.catch_low)}–${whole.format(day.catch_high)} birds`;
+  document.querySelector("#catch-context").textContent = `Higher than ${whole.format(day.historical_percentile)}% of historical catches around this date.`;
+  document.querySelector("#moon-icon").innerHTML = moonSymbol(day.moon_days_from_new_moon);
+  document.querySelector("#moon-phase").textContent = phase.label;
+  document.querySelector("#mist-value").textContent = whole.format(day.mist_probability_pct);
+  document.querySelector("#mist-meter-fill").style.width = `${Math.max(0, Math.min(100, day.mist_probability_pct))}%`;
+  document.querySelector("#weather-grid").innerHTML = weatherMarkup(day);
+}
+
+function renderNextDays(days) {
+  const container = document.querySelector("#next-days");
+  if (!days.length) {
+    container.innerHTML = `<p class="empty-state">No live weather forecast is available for the next three ringing dates.</p>`;
+    return;
+  }
+
+  container.innerHTML = days.map(day => {
+    return `<article class="day-card">
+      <div class="day-date"><strong>${weekday.format(parseDate(day.date))}</strong><span>${dayMonth.format(parseDate(day.date))}</span></div>
+      <div class="day-catch"><strong>${whole.format(day.expected_catch)} birds</strong><span>${whole.format(day.catch_low)}–${whole.format(day.catch_high)} likely</span></div>
+      <div class="day-signals">
+        <span class="day-moon">${moonSymbol(day.moon_days_from_new_moon)}</span>
+        <span class="day-mist"><strong>${whole.format(day.mist_probability_pct)}%</strong><span>mist</span></span>
       </div>
-      <div class="day-score">${number.format(day.opportunity_index)}<small>${moonLabel(day.moon_distance_from_new_moon)}</small></div>
     </article>`;
   }).join("");
 }
 
-function renderTiming(days) {
-  document.querySelector("#timing-strip").innerHTML = days.slice(0, 14).map(day => `
-    <article class="timing-day" role="listitem">
-      <span>${shortDate.format(parseDate(day.date))}</span>
-      <strong>${number.format(day.baseline_index)}</strong>
-      <span>baseline</span>
-      <span class="moon">${moonLabel(day.moon_distance_from_new_moon)}</span>
-    </article>`).join("");
+function renderSeasonChart(values, displayDate) {
+  const container = document.querySelector("#season-chart");
+  if (!values.length) {
+    container.innerHTML = `<p class="empty-state">Season outlook unavailable.</p>`;
+    return;
+  }
+
+  const width = 720;
+  const height = 255;
+  const margin = { top: 20, right: 10, bottom: 34, left: 38 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+  const liveValues = values.filter(d => d.expected_catch != null);
+  const maxValue = Math.max(...values.map(d => d.baseline_expected_catch), ...liveValues.map(d => d.expected_catch), 1) * 1.15;
+  const x = index => margin.left + index * plotWidth / (values.length - 1);
+  const y = value => margin.top + plotHeight - Math.min(value, maxValue) * plotHeight / maxValue;
+  const path = (rows, field) => rows.map((d, i) => `${i ? "L" : "M"}${x(values.indexOf(d)).toFixed(1)},${y(d[field]).toFixed(1)}`).join(" ");
+  const baselinePath = path(values, "baseline_expected_catch");
+  const livePath = liveValues.length > 1 ? path(liveValues, "expected_catch") : "";
+
+  let rangeBand = "";
+  if (liveValues.length > 1) {
+    const upper = liveValues.map(d => `${x(values.indexOf(d)).toFixed(1)},${y(d.catch_high).toFixed(1)}`);
+    const lower = [...liveValues].reverse().map(d => `${x(values.indexOf(d)).toFixed(1)},${y(d.catch_low).toFixed(1)}`);
+    rangeBand = `<polygon class="range-band" points="${[...upper, ...lower].join(" ")}"></polygon>`;
+  }
+
+  const yTicks = [0, maxValue / 2, maxValue];
+  const grid = yTicks.map(value => `<g><line class="grid" x1="${margin.left}" x2="${width - margin.right}" y1="${y(value)}" y2="${y(value)}"></line><text x="${margin.left - 7}" y="${y(value) + 4}" text-anchor="end">${whole.format(value)}</text></g>`).join("");
+  const monthIndices = values.reduce((out, row, index) => {
+    const month = parseDate(row.date).getUTCMonth();
+    if (!out.some(item => item.month === month)) out.push({ month, index, label: monthName.format(parseDate(row.date)) });
+    return out;
+  }, []);
+  const monthLabels = monthIndices.map((item, index) => `<text x="${x(item.index)}" y="${height - 8}" text-anchor="${index === monthIndices.length - 1 ? "end" : "start"}">${item.label}</text>`).join("");
+  const todayIndex = values.findIndex(row => row.date === displayDate);
+  const todayMarker = todayIndex >= 0 ? `
+    <line class="today-line" x1="${x(todayIndex)}" x2="${x(todayIndex)}" y1="${margin.top}" y2="${margin.top + plotHeight}"></line>
+    <text class="today-label" x="${x(todayIndex) + 5}" y="${margin.top + 11}">Today</text>` : "";
+
+  container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="season-chart-title season-chart-desc">
+    <title id="season-chart-title">Predicted catch across the ringing season</title>
+    <desc id="season-chart-desc">Date and moon baseline for the full season, with weather-adjusted expected catch and an 80 percent range where live weather is available.</desc>
+    ${grid}
+    ${rangeBand}
+    <path class="baseline-path" d="${baselinePath}"></path>
+    ${livePath ? `<path class="live-path" d="${livePath}"></path>` : ""}
+    <line class="axis-line" x1="${margin.left}" x2="${width - margin.right}" y1="${margin.top + plotHeight}" y2="${margin.top + plotHeight}"></line>
+    ${todayMarker}
+    ${monthLabels}
+  </svg>`;
 }
 
 async function loadForecast() {
   try {
-    const response = await fetch(`data/forecast.json?v=${Date.now()}`, { cache: "no-store" });
+    const dataFile = demoMode ? "forecast.demo.json" : "forecast.json";
+    const response = await fetch(`data/${dataFile}?v=${Date.now()}`, { cache: "no-store" });
     if (!response.ok) throw new Error(`Forecast request failed: ${response.status}`);
     const data = await response.json();
     const generated = new Date(data.generated_at);
-    document.querySelector("#update-label").textContent = `Updated ${generated.toLocaleString("en", { dateStyle: "medium", timeStyle: "short" })}`;
-    document.querySelector("#season-chip").textContent = data.forecast.length ? "Live season forecast" : `Season starts ${shortDate.format(parseDate(data.status.next_season_start))}`;
-    setPrimary(data.forecast[0]);
-    renderForecast(data.forecast, data.status.next_season_start);
-    renderTiming(data.timing_outlook);
+    document.body.classList.toggle("demo-mode", Boolean(data.demo_mode));
+    document.querySelector("#update-label").textContent = `${data.demo_mode ? "Demo" : "Updated"} ${generated.toLocaleString("en", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`;
+    document.querySelector("#season-chip").textContent = data.demo_mode ? "Demo · live weather" : data.forecast.length ? "ECMWF live" : `Starts ${dayMonth.format(parseDate(data.status.next_season_start))}`;
+    setLive(data.forecast[0]);
+    renderNextDays(data.forecast.slice(1, 4));
+    const displayDate = data.demo_mode && data.forecast.length
+      ? data.forecast[0].date
+      : new Date().toLocaleDateString("en-CA", { timeZone: data.source.timezone });
+    renderSeasonChart(data.season_outlook || [], displayDate);
   } catch (error) {
-    document.querySelector("#update-label").textContent = "Forecast unavailable";
-    document.querySelector("#season-chip").textContent = "Update pending";
-    document.querySelector("#primary-panel").classList.remove("loading");
-    document.querySelector("#score-context").textContent = "The latest forecast could not be loaded. Please try again shortly.";
-    document.querySelector("#forecast-empty").hidden = false;
-    document.querySelector("#forecast-empty").textContent = error.message;
+    document.querySelector("#update-label").textContent = "Unavailable";
+    document.querySelector("#primary-date").textContent = "Forecast unavailable";
+    document.querySelector("#catch-range").textContent = "Please try again shortly.";
+    console.error(error);
   }
 }
 
 loadForecast();
-

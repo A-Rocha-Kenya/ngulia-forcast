@@ -13,6 +13,7 @@ Imports:
     jsonlite,
     lubridate,
     mgcv,
+    nnet,
     readr,
     tibble,
     tidyr

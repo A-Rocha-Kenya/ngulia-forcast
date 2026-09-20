@@ -42,7 +42,7 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::cli, any::dplyr, any::jsonlite, any::lubridate, any::mgcv, any::readr, any::tibble, any::tidyr
+          extra-packages: any::cli, any::dplyr, any::jsonlite, any::lubridate, any::mgcv, any::nnet, any::readr, any::tibble, any::tidyr
 
       - name: Train forecast model
         run: Rscript scripts/train_model.R
@@ -80,4 +80,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#071117">
-    <meta name="description" content="Daily weather-adjusted catch opportunity for the Ngulia ringing season.">
+    <meta name="description" content="Daily predicted catch for the Ngulia ringing season.">
     <title>Ngulia catch forecast</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
@@ -13,90 +13,68 @@
     <header class="site-header">
       <a class="brand" href="./" aria-label="Ngulia catch forecast home">
         <span class="brand-mark" aria-hidden="true">N</span>
-        <span>
-          <strong>Ngulia</strong>
-          <small>catch forecast</small>
-        </span>
+        <span><strong>Ngulia</strong><small>catch forecast</small></span>
       </a>
-      <div class="update-state">
-        <span class="pulse" aria-hidden="true"></span>
-        <span id="update-label">Loading forecast…</span>
-      </div>
+      <div class="update-state"><span class="pulse" aria-hidden="true"></span><span id="update-label">Loading…</span></div>
     </header>
 
     <main>
-      <section class="forecast-head" aria-labelledby="page-title">
-        <div>
-          <p class="eyebrow">Tsavo West · Kenya</p>
-          <h1 id="page-title">Tonight at Ngulia</h1>
-          <p class="intro">Weather-adjusted opportunity for planning the ringing night.</p>
+      <section class="live-section" aria-labelledby="live-title" aria-live="polite">
+        <div class="section-kicker">
+          <h1 id="live-title">Today</h1>
+          <span id="season-chip">Checking forecast</span>
         </div>
-        <div class="season-chip" id="season-chip">Checking season</div>
+        <p class="live-date" id="primary-date">Tonight</p>
+        <div class="catch-reading">
+          <span class="catch-value" id="primary-catch">—</span>
+          <span class="catch-unit">birds expected</span>
+        </div>
+        <p class="catch-range" id="catch-range">Loading uncertainty range…</p>
+        <p class="catch-context" id="catch-context"></p>
+
+        <div class="primary-signals">
+          <article class="signal moon-signal">
+            <span class="signal-label">Moon</span>
+            <span class="moon-icon" id="moon-icon" aria-hidden="true">●</span>
+            <strong id="moon-phase">—</strong>
+          </article>
+          <article class="signal mist-signal">
+            <span class="signal-label">Mist probability</span>
+            <div class="mist-reading"><strong id="mist-value">—</strong><span>%</span></div>
+            <div class="mist-meter" aria-hidden="true"><i id="mist-meter-fill"></i></div>
+          </article>
+        </div>
+
+        <details class="weather-details">
+          <summary>Weather details</summary>
+          <div class="weather-grid" id="weather-grid"></div>
+        </details>
       </section>
 
-      <section id="primary-panel" class="primary-panel loading" aria-live="polite">
-        <div class="score-block">
-          <p class="panel-label" id="primary-date">Current outlook</p>
-          <div class="score-line">
-            <span class="score" id="primary-score">—</span>
-            <span class="score-unit">opportunity</span>
-          </div>
-          <p class="score-context" id="score-context">100 is the historical average positive-catch opportunity.</p>
-        </div>
-        <div class="conditions" id="conditions"></div>
-      </section>
-
-      <section class="section" aria-labelledby="outlook-title">
+      <section class="next-section" aria-labelledby="next-title">
         <div class="section-heading">
-          <div>
-            <p class="eyebrow">Planning window</p>
-            <h2 id="outlook-title">15-day outlook</h2>
-          </div>
-          <div class="legend" aria-label="Chart legend">
-            <span><i class="legend-weather"></i> Weather-adjusted</span>
-            <span><i class="legend-baseline"></i> Date + moon</span>
-          </div>
+          <h2 id="next-title">Next days</h2>
         </div>
-        <div id="forecast-empty" class="empty-state" hidden></div>
-        <div id="forecast-chart" class="forecast-chart" role="list"></div>
+        <div id="next-days" class="next-days"></div>
       </section>
 
-      <section class="section timing-section" aria-labelledby="timing-title">
+      <section class="season-section" aria-labelledby="season-title">
         <div class="section-heading">
-          <div>
-            <p class="eyebrow">Before weather enters range</p>
-            <h2 id="timing-title">Season timing outlook</h2>
-          </div>
-          <p class="section-note">Date and moon only</p>
+          <h2 id="season-title">Entire season</h2>
         </div>
-        <div id="timing-strip" class="timing-strip" role="list"></div>
-      </section>
-
-      <section class="method-grid" aria-label="Forecast interpretation">
-        <article>
-          <p class="eyebrow">Use it for</p>
-          <h2>Preparation, not promises</h2>
-          <p>Higher scores indicate dates historically associated with stronger catches under comparable local weather. They can support staffing and equipment planning.</p>
-        </article>
-        <article>
-          <p class="eyebrow">What the score means</p>
-          <h2>Conditional opportunity</h2>
-          <p>The model assumes ringing takes place. Lighting, nets, playback, team size and passage conditions beyond Ngulia can still dominate the result.</p>
-        </article>
-        <article>
-          <p class="eyebrow">Forecast source</p>
-          <h2>ECMWF through Open-Meteo</h2>
-          <p>Hourly forecasts are summarized for 00:00–08:00 East Africa Time. Confidence naturally falls with forecast lead.</p>
-        </article>
+        <div class="season-legend">
+          <span><i class="line-live"></i> Weather forecast</span>
+          <span><i class="line-baseline"></i> Date + moon</span>
+        </div>
+        <div id="season-chart" class="season-chart"></div>
       </section>
     </main>
 
     <footer>
-      <p>Ngulia Ringing Project · A weather-adjusted planning tool</p>
-      <a href="https://github.com/A-Rocha-Kenya/ngulia-forcast">Source and method</a>
+      <span>Conditional on ringing taking place · 80% model range</span>
+      <a href="https://github.com/A-Rocha-Kenya/ngulia-forcast">Method</a>
     </footer>
 
     <script src="app.js" defer></script>
   </body>
 </html>
-

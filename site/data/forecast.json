@@ -1,5 +1,6 @@
 {
-  "generated_at": "2026-09-20T18:32:31Z",
+  "generated_at": "2026-09-20T19:35:18Z",
+  "demo_mode": false,
   "source": {
     "provider": "Open-Meteo",
     "model": "ECMWF IFS 0.25°",
@@ -23,132 +24,771 @@
     "forecast_dates_in_season": 0
   },
   "forecast": [],
-  "timing_outlook": [
+  "season_outlook": [
     {
       "date": "2026-10-20",
-      "baseline_index": 1.4,
+      "baseline_expected_catch": 6.4,
       "moon_distance_from_new_moon": 9,
-      "moon_days_from_new_moon": 9.1
+      "moon_days_from_new_moon": 9.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-21",
-      "baseline_index": 1.3,
+      "baseline_expected_catch": 6,
       "moon_distance_from_new_moon": 10,
-      "moon_days_from_new_moon": 10.1
+      "moon_days_from_new_moon": 10.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-22",
-      "baseline_index": 1.2,
+      "baseline_expected_catch": 5.4,
       "moon_distance_from_new_moon": 11,
-      "moon_days_from_new_moon": 11.1
+      "moon_days_from_new_moon": 11.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-23",
-      "baseline_index": 1,
+      "baseline_expected_catch": 4.5,
       "moon_distance_from_new_moon": 12,
-      "moon_days_from_new_moon": 12.1
+      "moon_days_from_new_moon": 12.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-24",
-      "baseline_index": 0.8,
+      "baseline_expected_catch": 3.6,
       "moon_distance_from_new_moon": 13,
-      "moon_days_from_new_moon": 13.1
+      "moon_days_from_new_moon": 13.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-25",
-      "baseline_index": 0.6,
+      "baseline_expected_catch": 2.8,
       "moon_distance_from_new_moon": 14,
-      "moon_days_from_new_moon": 14.1
+      "moon_days_from_new_moon": 14.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-26",
-      "baseline_index": 0.7,
+      "baseline_expected_catch": 3.2,
       "moon_distance_from_new_moon": 14,
-      "moon_days_from_new_moon": -14.4
+      "moon_days_from_new_moon": -14.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-27",
-      "baseline_index": 1.2,
+      "baseline_expected_catch": 5.5,
       "moon_distance_from_new_moon": 13,
-      "moon_days_from_new_moon": -13.4
+      "moon_days_from_new_moon": -13.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-28",
-      "baseline_index": 1.9,
+      "baseline_expected_catch": 9,
       "moon_distance_from_new_moon": 12,
-      "moon_days_from_new_moon": -12.4
+      "moon_days_from_new_moon": -12.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-29",
-      "baseline_index": 3,
+      "baseline_expected_catch": 14.1,
       "moon_distance_from_new_moon": 11,
-      "moon_days_from_new_moon": -11.4
+      "moon_days_from_new_moon": -11.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-30",
-      "baseline_index": 4.5,
+      "baseline_expected_catch": 20.8,
       "moon_distance_from_new_moon": 10,
-      "moon_days_from_new_moon": -10.4
+      "moon_days_from_new_moon": -10.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-10-31",
-      "baseline_index": 6.2,
+      "baseline_expected_catch": 29,
       "moon_distance_from_new_moon": 9,
-      "moon_days_from_new_moon": -9.4
+      "moon_days_from_new_moon": -9.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-11-01",
-      "baseline_index": 8.2,
+      "baseline_expected_catch": 38.4,
       "moon_distance_from_new_moon": 8,
-      "moon_days_from_new_moon": -8.4
+      "moon_days_from_new_moon": -8.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-11-02",
-      "baseline_index": 10.6,
+      "baseline_expected_catch": 49.1,
       "moon_distance_from_new_moon": 7,
-      "moon_days_from_new_moon": -7.4
+      "moon_days_from_new_moon": -7.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-11-03",
-      "baseline_index": 13.3,
+      "baseline_expected_catch": 62,
       "moon_distance_from_new_moon": 6,
-      "moon_days_from_new_moon": -6.4
+      "moon_days_from_new_moon": -6.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-11-04",
-      "baseline_index": 16.7,
+      "baseline_expected_catch": 77.8,
       "moon_distance_from_new_moon": 5,
-      "moon_days_from_new_moon": -5.4
+      "moon_days_from_new_moon": -5.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-11-05",
-      "baseline_index": 20.9,
+      "baseline_expected_catch": 97.3,
       "moon_distance_from_new_moon": 4,
-      "moon_days_from_new_moon": -4.4
+      "moon_days_from_new_moon": -4.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-11-06",
-      "baseline_index": 25.9,
+      "baseline_expected_catch": 120.5,
       "moon_distance_from_new_moon": 3,
-      "moon_days_from_new_moon": -3.4
+      "moon_days_from_new_moon": -3.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-11-07",
-      "baseline_index": 31.6,
+      "baseline_expected_catch": 146.9,
       "moon_distance_from_new_moon": 2,
-      "moon_days_from_new_moon": -2.4
+      "moon_days_from_new_moon": -2.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-11-08",
-      "baseline_index": 37.9,
+      "baseline_expected_catch": 176.1,
       "moon_distance_from_new_moon": 1,
-      "moon_days_from_new_moon": -1.4
+      "moon_days_from_new_moon": -1.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     },
     {
       "date": "2026-11-09",
-      "baseline_index": 44.9,
+      "baseline_expected_catch": 209,
       "moon_distance_from_new_moon": 0,
-      "moon_days_from_new_moon": -0.4
+      "moon_days_from_new_moon": -0.4,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-10",
+      "baseline_expected_catch": 228.3,
+      "moon_distance_from_new_moon": 1,
+      "moon_days_from_new_moon": 0.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-11",
+      "baseline_expected_catch": 246.6,
+      "moon_distance_from_new_moon": 2,
+      "moon_days_from_new_moon": 1.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-12",
+      "baseline_expected_catch": 261.5,
+      "moon_distance_from_new_moon": 3,
+      "moon_days_from_new_moon": 2.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-13",
+      "baseline_expected_catch": 272.2,
+      "moon_distance_from_new_moon": 4,
+      "moon_days_from_new_moon": 3.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-14",
+      "baseline_expected_catch": 279.6,
+      "moon_distance_from_new_moon": 5,
+      "moon_days_from_new_moon": 4.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-15",
+      "baseline_expected_catch": 284.8,
+      "moon_distance_from_new_moon": 6,
+      "moon_days_from_new_moon": 5.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-16",
+      "baseline_expected_catch": 287.1,
+      "moon_distance_from_new_moon": 7,
+      "moon_days_from_new_moon": 6.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-17",
+      "baseline_expected_catch": 283.4,
+      "moon_distance_from_new_moon": 8,
+      "moon_days_from_new_moon": 7.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-18",
+      "baseline_expected_catch": 269,
+      "moon_distance_from_new_moon": 9,
+      "moon_days_from_new_moon": 8.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-19",
+      "baseline_expected_catch": 241.4,
+      "moon_distance_from_new_moon": 10,
+      "moon_days_from_new_moon": 9.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-20",
+      "baseline_expected_catch": 202.7,
+      "moon_distance_from_new_moon": 11,
+      "moon_days_from_new_moon": 10.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-21",
+      "baseline_expected_catch": 159.3,
+      "moon_distance_from_new_moon": 12,
+      "moon_days_from_new_moon": 11.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-22",
+      "baseline_expected_catch": 118.3,
+      "moon_distance_from_new_moon": 13,
+      "moon_days_from_new_moon": 12.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-23",
+      "baseline_expected_catch": 84.5,
+      "moon_distance_from_new_moon": 14,
+      "moon_days_from_new_moon": 13.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-24",
+      "baseline_expected_catch": 59,
+      "moon_distance_from_new_moon": 15,
+      "moon_days_from_new_moon": 14.6,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-25",
+      "baseline_expected_catch": 91.7,
+      "moon_distance_from_new_moon": 14,
+      "moon_days_from_new_moon": -13.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-26",
+      "baseline_expected_catch": 139.3,
+      "moon_distance_from_new_moon": 13,
+      "moon_days_from_new_moon": -12.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-27",
+      "baseline_expected_catch": 203.6,
+      "moon_distance_from_new_moon": 12,
+      "moon_days_from_new_moon": -11.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-28",
+      "baseline_expected_catch": 281.6,
+      "moon_distance_from_new_moon": 11,
+      "moon_days_from_new_moon": -10.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-29",
+      "baseline_expected_catch": 365,
+      "moon_distance_from_new_moon": 10,
+      "moon_days_from_new_moon": -9.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-11-30",
+      "baseline_expected_catch": 443.1,
+      "moon_distance_from_new_moon": 9,
+      "moon_days_from_new_moon": -8.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-01",
+      "baseline_expected_catch": 509.2,
+      "moon_distance_from_new_moon": 8,
+      "moon_days_from_new_moon": -7.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-02",
+      "baseline_expected_catch": 563.3,
+      "moon_distance_from_new_moon": 7,
+      "moon_days_from_new_moon": -6.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-03",
+      "baseline_expected_catch": 610.6,
+      "moon_distance_from_new_moon": 6,
+      "moon_days_from_new_moon": -5.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-04",
+      "baseline_expected_catch": 655.4,
+      "moon_distance_from_new_moon": 5,
+      "moon_days_from_new_moon": -4.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-05",
+      "baseline_expected_catch": 697.7,
+      "moon_distance_from_new_moon": 4,
+      "moon_days_from_new_moon": -3.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-06",
+      "baseline_expected_catch": 732.6,
+      "moon_distance_from_new_moon": 3,
+      "moon_days_from_new_moon": -2.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-07",
+      "baseline_expected_catch": 754.4,
+      "moon_distance_from_new_moon": 2,
+      "moon_days_from_new_moon": -1.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-08",
+      "baseline_expected_catch": 761.6,
+      "moon_distance_from_new_moon": 1,
+      "moon_days_from_new_moon": -0.9,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-09",
+      "baseline_expected_catch": 758.9,
+      "moon_distance_from_new_moon": 0,
+      "moon_days_from_new_moon": 0.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-10",
+      "baseline_expected_catch": 694.4,
+      "moon_distance_from_new_moon": 1,
+      "moon_days_from_new_moon": 1.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-11",
+      "baseline_expected_catch": 627.3,
+      "moon_distance_from_new_moon": 2,
+      "moon_days_from_new_moon": 2.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-12",
+      "baseline_expected_catch": 555.7,
+      "moon_distance_from_new_moon": 3,
+      "moon_days_from_new_moon": 3.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-13",
+      "baseline_expected_catch": 483.2,
+      "moon_distance_from_new_moon": 4,
+      "moon_days_from_new_moon": 4.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-14",
+      "baseline_expected_catch": 414.9,
+      "moon_distance_from_new_moon": 5,
+      "moon_days_from_new_moon": 5.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-15",
+      "baseline_expected_catch": 353.8,
+      "moon_distance_from_new_moon": 6,
+      "moon_days_from_new_moon": 6.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-16",
+      "baseline_expected_catch": 299.4,
+      "moon_distance_from_new_moon": 7,
+      "moon_days_from_new_moon": 7.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-17",
+      "baseline_expected_catch": 248.8,
+      "moon_distance_from_new_moon": 8,
+      "moon_days_from_new_moon": 8.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-18",
+      "baseline_expected_catch": 199.7,
+      "moon_distance_from_new_moon": 9,
+      "moon_days_from_new_moon": 9.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-19",
+      "baseline_expected_catch": 152.3,
+      "moon_distance_from_new_moon": 10,
+      "moon_days_from_new_moon": 10.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-20",
+      "baseline_expected_catch": 109.3,
+      "moon_distance_from_new_moon": 11,
+      "moon_days_from_new_moon": 11.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-21",
+      "baseline_expected_catch": 73.9,
+      "moon_distance_from_new_moon": 12,
+      "moon_days_from_new_moon": 12.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-22",
+      "baseline_expected_catch": 47.6,
+      "moon_distance_from_new_moon": 13,
+      "moon_days_from_new_moon": 13.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-23",
+      "baseline_expected_catch": 29.7,
+      "moon_distance_from_new_moon": 14,
+      "moon_days_from_new_moon": 14.1,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-24",
+      "baseline_expected_catch": 27.3,
+      "moon_distance_from_new_moon": 14,
+      "moon_days_from_new_moon": -14.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-25",
+      "baseline_expected_catch": 37.2,
+      "moon_distance_from_new_moon": 13,
+      "moon_days_from_new_moon": -13.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-26",
+      "baseline_expected_catch": 49,
+      "moon_distance_from_new_moon": 12,
+      "moon_days_from_new_moon": -12.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-27",
+      "baseline_expected_catch": 61.7,
+      "moon_distance_from_new_moon": 11,
+      "moon_days_from_new_moon": -11.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-28",
+      "baseline_expected_catch": 73.4,
+      "moon_distance_from_new_moon": 10,
+      "moon_days_from_new_moon": -10.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-29",
+      "baseline_expected_catch": 82.3,
+      "moon_distance_from_new_moon": 9,
+      "moon_days_from_new_moon": -9.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-30",
+      "baseline_expected_catch": 88.1,
+      "moon_distance_from_new_moon": 8,
+      "moon_days_from_new_moon": -8.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2026-12-31",
+      "baseline_expected_catch": 91.5,
+      "moon_distance_from_new_moon": 7,
+      "moon_days_from_new_moon": -7.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-01",
+      "baseline_expected_catch": 93.7,
+      "moon_distance_from_new_moon": 6,
+      "moon_days_from_new_moon": -6.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-02",
+      "baseline_expected_catch": 95.5,
+      "moon_distance_from_new_moon": 5,
+      "moon_days_from_new_moon": -5.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-03",
+      "baseline_expected_catch": 97.2,
+      "moon_distance_from_new_moon": 4,
+      "moon_days_from_new_moon": -4.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-04",
+      "baseline_expected_catch": 98.1,
+      "moon_distance_from_new_moon": 3,
+      "moon_days_from_new_moon": -3.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-05",
+      "baseline_expected_catch": 97.6,
+      "moon_distance_from_new_moon": 2,
+      "moon_days_from_new_moon": -2.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-06",
+      "baseline_expected_catch": 95.5,
+      "moon_distance_from_new_moon": 1,
+      "moon_days_from_new_moon": -1.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-07",
+      "baseline_expected_catch": 92.7,
+      "moon_distance_from_new_moon": 0,
+      "moon_days_from_new_moon": -0.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-08",
+      "baseline_expected_catch": 83,
+      "moon_distance_from_new_moon": 1,
+      "moon_days_from_new_moon": 0.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-09",
+      "baseline_expected_catch": 73.6,
+      "moon_distance_from_new_moon": 2,
+      "moon_days_from_new_moon": 1.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-10",
+      "baseline_expected_catch": 64.2,
+      "moon_distance_from_new_moon": 3,
+      "moon_days_from_new_moon": 2.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-11",
+      "baseline_expected_catch": 55.2,
+      "moon_distance_from_new_moon": 4,
+      "moon_days_from_new_moon": 3.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
+    },
+    {
+      "date": "2027-01-12",
+      "baseline_expected_catch": 47,
+      "moon_distance_from_new_moon": 5,
+      "moon_days_from_new_moon": 4.5,
+      "expected_catch": null,
+      "catch_low": null,
+      "catch_high": null
     }
   ]
 }

@@ -1,6 +1,7 @@
 library(dplyr)
 library(readr)
 library(mgcv)
+library(nnet)
 library(cli)
 
 # Set paths ---------------------------------------------------------------
@@ -14,12 +15,14 @@ dir.create(model_dir, recursive = TRUE, showWarnings = FALSE)
 
 cli_h1("Train Ngulia forecast models")
 
-training_data <- read_csv(
+daily_coverage <- read_csv(
   data_path,
   show_col_types = FALSE,
   guess_max = Inf,
   col_types = cols(ringing_date = col_date())
-) |>
+)
+
+training_data <- daily_coverage |>
   filter(
     ringing_happened,
     if_all(
@@ -36,6 +39,27 @@ training_data <- read_csv(
     )
   ) |>
   mutate(rain_log = log1p(total_precipitation_00_08_mm))
+
+mist_training_data <- daily_coverage |>
+  filter(
+    mist_observation %in% c("none", "light_patchy", "good"),
+    if_all(
+      c(
+        total_cloud_cover_mean,
+        relative_humidity_mean_pct,
+        wind_u_10m_mean_ms,
+        total_precipitation_00_08_mm,
+        temperature_2m_mean_c,
+        surface_pressure_mean_hpa
+      ),
+      ~ !is.na(.x)
+    )
+  ) |>
+  mutate(
+    mist_state = factor(mist_observation, levels = c("none", "light_patchy", "good")),
+    cloud_cover_fraction = total_cloud_cover_mean,
+    rain_log = log1p(total_precipitation_00_08_mm)
+  )
 
 baseline_formula <- total_birds_ringed ~
   s(season_day, k = 12) +
@@ -57,6 +81,13 @@ models <- list(
   weather = bam(weather_formula, data = training_data, family = nb(), method = "fREML", discrete = TRUE)
 )
 
+mist_model <- multinom(
+  mist_state ~ cloud_cover_fraction + relative_humidity_mean_pct +
+    wind_u_10m_mean_ms + rain_log + temperature_2m_mean_c + surface_pressure_mean_hpa,
+  data = mist_training_data,
+  trace = FALSE
+)
+
 weather_columns <- c(
   "rain_log",
   "wind_speed_10m_mean_ms",
@@ -68,8 +99,11 @@ training_bounds <- lapply(training_data[weather_columns], range)
 
 forecast_model <- list(
   models = models,
+  mist_model = mist_model,
+  negative_binomial_size = models$weather$family$getTheta(TRUE),
   reference_mean = mean(fitted(models$weather)),
   training_bounds = training_bounds,
+  historical_reference = select(training_data, season_day, total_birds_ringed),
   training = list(
     n_dates = nrow(training_data),
     n_seasons = n_distinct(training_data$season),
@@ -81,4 +115,4 @@ forecast_model <- list(
 
 saveRDS(forecast_model, file.path(model_dir, "forecast_model.rds"))
 cli_alert_success("Model trained on {nrow(training_data)} dates across {n_distinct(training_data$season)} seasons")
-
+cli_alert_success("Mist probability model trained on {nrow(mist_training_data)} observed dates")
