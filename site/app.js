@@ -3,6 +3,7 @@ const oneDecimal = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
 const weekday = new Intl.DateTimeFormat("en", { weekday: "short", timeZone: "UTC" });
 const dayMonth = new Intl.DateTimeFormat("en", { day: "numeric", month: "short", timeZone: "UTC" });
 const longDate = new Intl.DateTimeFormat("en", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+const chartDate = new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 const monthName = new Intl.DateTimeFormat("en", { month: "short", timeZone: "UTC" });
 const demoMode = new URLSearchParams(window.location.search).get("demo") === "1";
 
@@ -117,7 +118,12 @@ function renderSeasonChart(values, displayDate) {
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
   const liveValues = values.filter(d => d.expected_catch != null);
-  const maxValue = Math.max(...values.map(d => d.baseline_expected_catch), ...liveValues.map(d => d.expected_catch), 1) * 1.15;
+  const rawMax = Math.max(...values.map(d => d.baseline_expected_catch), ...liveValues.map(d => d.catch_high), 1);
+  const roughStep = rawMax / 2;
+  const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+  const normalizedStep = roughStep / magnitude;
+  const tickStep = (normalizedStep <= 1 ? 1 : normalizedStep <= 2 ? 2 : normalizedStep <= 5 ? 5 : 10) * magnitude;
+  const maxValue = Math.ceil(rawMax / tickStep) * tickStep;
   const x = index => margin.left + index * plotWidth / (values.length - 1);
   const y = value => margin.top + plotHeight - Math.min(value, maxValue) * plotHeight / maxValue;
   const path = (rows, field) => rows.map((d, i) => `${i ? "L" : "M"}${x(values.indexOf(d)).toFixed(1)},${y(d[field]).toFixed(1)}`).join(" ");
@@ -131,14 +137,21 @@ function renderSeasonChart(values, displayDate) {
     rangeBand = `<polygon class="range-band" points="${[...upper, ...lower].join(" ")}"></polygon>`;
   }
 
-  const yTicks = [0, maxValue / 2, maxValue];
+  const yTicks = Array.from({ length: Math.round(maxValue / tickStep) + 1 }, (_, index) => index * tickStep);
   const grid = yTicks.map(value => `<g><line class="grid" x1="${margin.left}" x2="${width - margin.right}" y1="${y(value)}" y2="${y(value)}"></line><text x="${margin.left - 7}" y="${y(value) + 4}" text-anchor="end">${whole.format(value)}</text></g>`).join("");
   const monthIndices = values.reduce((out, row, index) => {
     const month = parseDate(row.date).getUTCMonth();
     if (!out.some(item => item.month === month)) out.push({ month, index, label: monthName.format(parseDate(row.date)) });
     return out;
   }, []);
-  const monthLabels = monthIndices.map((item, index) => `<text x="${x(item.index)}" y="${height - 8}" text-anchor="${index === monthIndices.length - 1 ? "end" : "start"}">${item.label}</text>`).join("");
+  const firstYear = parseDate(values[0].date).getUTCFullYear();
+  const monthLabels = monthIndices.map((item, index) => {
+    const year = parseDate(values[item.index].date).getUTCFullYear();
+    const label = index === 0 || year !== parseDate(values[monthIndices[index - 1]?.index]?.date || values[0].date).getUTCFullYear()
+      ? `${item.label} ${year}`
+      : item.label;
+    return `<text x="${x(item.index)}" y="${height - 8}" text-anchor="${index === monthIndices.length - 1 ? "end" : "start"}">${label}</text>`;
+  }).join("");
   const todayIndex = values.findIndex(row => row.date === displayDate);
   const todayMarker = todayIndex >= 0 ? `
     <line class="today-line" x1="${x(todayIndex)}" x2="${x(todayIndex)}" y1="${margin.top}" y2="${margin.top + plotHeight}"></line>
@@ -154,7 +167,53 @@ function renderSeasonChart(values, displayDate) {
     <line class="axis-line" x1="${margin.left}" x2="${width - margin.right}" y1="${margin.top + plotHeight}" y2="${margin.top + plotHeight}"></line>
     ${todayMarker}
     ${monthLabels}
+    <text class="season-year" x="${width - margin.right}" y="12" text-anchor="end">${firstYear}–${String(firstYear + 1).slice(-2)} season</text>
+    <g class="chart-hover" hidden>
+      <line class="hover-guide" y1="${margin.top}" y2="${margin.top + plotHeight}"></line>
+      <circle class="hover-marker baseline-marker" r="4"></circle>
+      <circle class="hover-marker live-marker" r="4"></circle>
+      <g class="hover-tooltip">
+        <rect width="174" height="58" rx="7"></rect>
+        <text class="hover-date" x="10" y="17"></text>
+        <text class="hover-live" x="10" y="34"></text>
+        <text class="hover-baseline" x="10" y="50"></text>
+      </g>
+    </g>
+    <rect class="hover-overlay" x="${margin.left}" y="${margin.top}" width="${plotWidth}" height="${plotHeight}" tabindex="0" aria-label="Explore daily catch predictions"></rect>
   </svg>`;
+
+  const svg = container.querySelector("svg");
+  const overlay = svg.querySelector(".hover-overlay");
+  const hover = svg.querySelector(".chart-hover");
+  const updateHover = clientX => {
+    const bounds = svg.getBoundingClientRect();
+    const svgX = (clientX - bounds.left) * width / bounds.width;
+    const index = Math.max(0, Math.min(values.length - 1, Math.round((svgX - margin.left) * (values.length - 1) / plotWidth)));
+    const row = values[index];
+    const pointX = x(index);
+    const tooltipX = Math.min(width - margin.right - 174, Math.max(margin.left, pointX + 10));
+    const liveAvailable = row.expected_catch != null;
+    hover.removeAttribute("hidden");
+    hover.querySelector(".hover-guide").setAttribute("x1", pointX);
+    hover.querySelector(".hover-guide").setAttribute("x2", pointX);
+    hover.querySelector(".baseline-marker").setAttribute("cx", pointX);
+    hover.querySelector(".baseline-marker").setAttribute("cy", y(row.baseline_expected_catch));
+    hover.querySelector(".live-marker").toggleAttribute("hidden", !liveAvailable);
+    if (liveAvailable) {
+      hover.querySelector(".live-marker").setAttribute("cx", pointX);
+      hover.querySelector(".live-marker").setAttribute("cy", y(row.expected_catch));
+    }
+    hover.querySelector(".hover-tooltip").setAttribute("transform", `translate(${tooltipX} ${margin.top + 6})`);
+    hover.querySelector(".hover-date").textContent = chartDate.format(parseDate(row.date));
+    hover.querySelector(".hover-live").textContent = liveAvailable ? `Weather: ${whole.format(row.expected_catch)} birds` : "Weather: unavailable";
+    hover.querySelector(".hover-baseline").textContent = `Date + moon: ${whole.format(row.baseline_expected_catch)} birds`;
+    overlay.setAttribute("aria-label", `${chartDate.format(parseDate(row.date))}. ${liveAvailable ? `Weather forecast ${whole.format(row.expected_catch)} birds. ` : ""}Date and moon forecast ${whole.format(row.baseline_expected_catch)} birds.`);
+  };
+  overlay.addEventListener("pointermove", event => updateHover(event.clientX));
+  overlay.addEventListener("pointerdown", event => updateHover(event.clientX));
+  overlay.addEventListener("pointerleave", () => { hover.setAttribute("hidden", ""); });
+  overlay.addEventListener("focus", () => updateHover(overlay.getBoundingClientRect().left + overlay.getBoundingClientRect().width / 2));
+  overlay.addEventListener("blur", () => { hover.setAttribute("hidden", ""); });
 }
 
 async function loadForecast() {

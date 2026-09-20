@@ -196,6 +196,16 @@ section + section { margin-top: 58px; }
 .season-chart .today-line { stroke: var(--ink); stroke-width: 1; opacity: 0.45; }
 .season-chart .axis-line { stroke: rgba(145, 168, 170, 0.28); stroke-width: 1; }
 .season-chart .today-label { fill: var(--ink); font-weight: 650; }
+.season-chart .season-year { fill: var(--ink); font-weight: 650; }
+.season-chart .hover-overlay { fill: transparent; touch-action: none; }
+.season-chart .hover-guide { stroke: rgba(238, 247, 246, 0.45); stroke-width: 1; }
+.season-chart .hover-marker { stroke: var(--night); stroke-width: 2; }
+.season-chart [hidden] { display: none; }
+.season-chart .baseline-marker { fill: var(--cyan); }
+.season-chart .live-marker { fill: var(--amber); }
+.season-chart .hover-tooltip rect { fill: #13262d; stroke: var(--line); stroke-width: 1; }
+.season-chart .hover-tooltip text { fill: var(--ink); font-size: 11px; }
+.season-chart .hover-tooltip .hover-date { font-weight: 650; }
 
 .empty-state { padding: 20px 0; color: var(--muted); }
 
