@@ -20,19 +20,20 @@
 
     <main>
       <section class="live-section" aria-labelledby="live-title" aria-live="polite">
-        <div class="section-kicker">
-          <h1 id="live-title">Today</h1>
-          <span id="season-chip">Checking forecast</span>
-        </div>
-        <p class="live-date" id="primary-date">Tonight</p>
-        <div class="catch-reading">
-          <span class="catch-value" id="primary-catch">—</span>
-          <span class="catch-unit">birds expected</span>
-        </div>
-        <p class="catch-range" id="catch-range">Loading uncertainty range…</p>
-        <p class="catch-context" id="catch-context"></p>
+        <div class="live-cards">
+          <article class="today-card">
+            <div class="section-kicker">
+              <h1 id="live-title">Today</h1>
+            </div>
+            <p class="live-date" id="primary-date">Tonight</p>
+            <div class="catch-reading">
+              <span class="catch-value" id="primary-catch">—</span>
+              <span class="catch-unit">birds expected</span>
+            </div>
+            <p class="catch-range" id="catch-range">Loading uncertainty range…</p>
+            <p class="catch-context" id="catch-context"></p>
+          </article>
 
-        <div class="primary-signals">
           <article class="signal moon-signal">
             <span class="signal-label">Moon</span>
             <span class="moon-icon" id="moon-icon" aria-hidden="true">●</span>
@@ -40,8 +41,9 @@
           </article>
           <article class="signal mist-signal">
             <span class="signal-label">Mist probability</span>
-            <div class="mist-reading"><strong id="mist-value">—</strong><span>%</span></div>
-            <div class="mist-meter" aria-hidden="true"><i id="mist-meter-fill"></i></div>
+            <div class="mist-meter" aria-hidden="true">
+              <div class="mist-reading"><strong id="mist-value">—</strong><span>%</span></div>
+            </div>
           </article>
         </div>
 
@@ -72,7 +74,7 @@
 
     <footer>
       <span>Conditional on ringing taking place · 80% model range</span>
-      <a href="https://github.com/A-Rocha-Kenya/ngulia-forcast">Method</a>
+      <span class="footer-links"><a href="?demo=1">Demo</a><a href="https://github.com/A-Rocha-Kenya/ngulia-forcast">Method</a></span>
     </footer>
 
     <script src="app.js" defer></script>

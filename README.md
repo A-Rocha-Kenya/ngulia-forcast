@@ -28,6 +28,8 @@ python3 -m http.server 8000 --directory site
 
 Then open <http://localhost:8000>.
 
+To preview the example forecast at any time, open `?demo=1` (for example, <http://localhost:8000/?demo=1>). The same query works on the GitHub Pages deployment.
+
 ## Model interpretation
 
 The main value is the model's expected daily catch, conditional on ringing taking place. The 80% range represents model uncertainty rather than a guarantee. The historical percentile compares the prediction with observed catches around the same point in the ringing season. Historical operation, lighting, net configuration, staffing, and zero-catch coverage remain incomplete, so the output should be used as operational context rather than a precise abundance forecast.

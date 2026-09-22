@@ -82,7 +82,7 @@ function setLive(day) {
   document.querySelector("#moon-icon").innerHTML = moonSymbol(day.moon_days_from_new_moon);
   document.querySelector("#moon-phase").textContent = phase.label;
   document.querySelector("#mist-value").textContent = whole.format(day.mist_probability_pct);
-  document.querySelector("#mist-meter-fill").style.width = `${Math.max(0, Math.min(100, day.mist_probability_pct))}%`;
+  document.querySelector(".mist-meter").style.setProperty("--mist-percent", `${Math.max(0, Math.min(100, day.mist_probability_pct))}%`);
   document.querySelector("#weather-grid").innerHTML = weatherMarkup(day);
 }
 
@@ -126,7 +126,20 @@ function renderSeasonChart(values, displayDate) {
   const maxValue = Math.ceil(rawMax / tickStep) * tickStep;
   const x = index => margin.left + index * plotWidth / (values.length - 1);
   const y = value => margin.top + plotHeight - Math.min(value, maxValue) * plotHeight / maxValue;
-  const path = (rows, field) => rows.map((d, i) => `${i ? "L" : "M"}${x(values.indexOf(d)).toFixed(1)},${y(d[field]).toFixed(1)}`).join(" ");
+  const path = (rows, field) => {
+    const points = rows.map(d => [x(values.indexOf(d)), y(d[field])]);
+    if (points.length < 2) return "";
+    return points.reduce((commands, point, index) => {
+      if (index === 0) return [`M${point[0].toFixed(1)},${point[1].toFixed(1)}`];
+      const previous = points[index - 1];
+      const before = points[index - 2] || previous;
+      const after = points[index + 1] || point;
+      const control1 = [previous[0] + (point[0] - before[0]) / 6, previous[1] + (point[1] - before[1]) / 6];
+      const control2 = [point[0] - (after[0] - previous[0]) / 6, point[1] - (after[1] - previous[1]) / 6];
+      commands.push(`C${control1[0].toFixed(1)},${control1[1].toFixed(1)} ${control2[0].toFixed(1)},${control2[1].toFixed(1)} ${point[0].toFixed(1)},${point[1].toFixed(1)}`);
+      return commands;
+    }, []).join(" ");
+  };
   const baselinePath = path(values, "baseline_expected_catch");
   const livePath = liveValues.length > 1 ? path(liveValues, "expected_catch") : "";
 
@@ -224,10 +237,13 @@ async function loadForecast() {
     const data = await response.json();
     const generated = new Date(data.generated_at);
     document.body.classList.toggle("demo-mode", Boolean(data.demo_mode));
-    document.querySelector("#update-label").textContent = `${data.demo_mode ? "Demo" : "Updated"} ${generated.toLocaleString("en", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`;
-    document.querySelector("#season-chip").textContent = data.demo_mode ? "Demo · live weather" : data.forecast.length ? "ECMWF live" : `Starts ${dayMonth.format(parseDate(data.status.next_season_start))}`;
+    document.querySelector("#update-label").textContent = data.demo_mode
+      ? "Demo · live weather"
+      : data.forecast.length
+        ? `ECMWF live · updated ${generated.toLocaleString("en", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`
+        : `Forecast starts ${dayMonth.format(parseDate(data.status.next_season_start))}`;
     setLive(data.forecast[0]);
-    renderNextDays(data.forecast.slice(1, 4));
+    renderNextDays(data.forecast.slice(1, 6));
     const displayDate = data.demo_mode && data.forecast.length
       ? data.forecast[0].date
       : new Date().toLocaleDateString("en-CA", { timeZone: data.source.timezone });

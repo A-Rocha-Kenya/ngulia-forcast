@@ -7,10 +7,7 @@ on:
     paths:
       - "data/**"
       - "scripts/**"
-      - "site/index.html"
-      - "site/app.js"
-      - "site/styles.css"
-      - "site/favicon.svg"
+      - "site/**"
       - "DESCRIPTION"
       - ".github/workflows/update-forecast.yml"
   schedule:

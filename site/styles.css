@@ -33,7 +33,7 @@ a { color: inherit; }
 .site-header,
 main,
 footer {
-  width: min(100% - 28px, 760px);
+  width: min(100% - 28px, 1380px);
   margin-inline: auto;
 }
 
@@ -104,16 +104,6 @@ section + section { margin-top: 58px; }
   text-transform: uppercase;
 }
 
-#season-chip {
-  padding: 6px 10px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
-  font-size: 0.72rem;
-}
-
-.demo-mode #season-chip { border-color: rgba(240, 179, 77, 0.55); color: var(--amber); background: rgba(240, 179, 77, 0.07); }
-
 .live-date {
   margin: 20px 0 3px;
   color: var(--muted);
@@ -127,33 +117,45 @@ section + section { margin-top: 58px; }
 .catch-range { margin: 26px 0 4px; font-size: 1.05rem; font-weight: 650; }
 .catch-context { min-height: 23px; margin: 0; color: var(--muted); font-size: 0.9rem; }
 
-.primary-signals {
+.live-cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 28px;
 }
 
+.today-card,
 .signal {
   min-width: 0;
-  min-height: 152px;
-  padding: 17px;
+  padding: 22px;
   border-radius: 20px;
-  background: var(--panel);
+  background: linear-gradient(135deg, rgba(14, 32, 39, 0.98), rgba(8, 21, 27, 0.94));
 }
 
+.today-card { min-height: 252px; }
+.signal { min-height: 188px; }
+
 .signal-label { display: block; color: var(--muted); font-size: 0.72rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; }
-.moon-icon { display: block; width: 3.45rem; height: 3.45rem; margin: 7px 0 3px; }
+.moon-icon { display: block; width: 4.5rem; height: 4.5rem; margin: 20px 0 8px; }
 .moon-icon svg, .day-moon svg { display: block; width: 100%; height: 100%; }
 .moon-disc { fill: #14252c; }
 .moon-light { fill: #e5c777; }
 .moon-outline { fill: none; stroke: rgba(238, 247, 246, 0.28); stroke-width: 1.2; }
-.moon-signal strong { display: block; font-size: 1rem; }
-.mist-reading { display: flex; align-items: baseline; gap: 3px; margin-top: 18px; }
-.mist-reading strong { font-family: Georgia, serif; font-size: 3.4rem; font-weight: 500; line-height: 1; }
+.moon-signal strong { display: block; font-size: 1.2rem; }
+.mist-reading { display: flex; align-items: baseline; gap: 2px; }
+.mist-reading strong { font-family: Georgia, serif; font-size: 2.4rem; font-weight: 500; line-height: 1; }
 .mist-reading span { color: var(--muted); }
-.mist-meter { height: 5px; margin-top: 13px; overflow: hidden; border-radius: 4px; background: rgba(145, 168, 170, 0.16); }
-.mist-meter i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--cyan); }
+.mist-meter {
+  --mist-percent: 0%;
+  width: 110px;
+  aspect-ratio: 1;
+  margin: 18px auto 0;
+  display: grid;
+  place-items: center;
+  position: relative;
+  border-radius: 50%;
+  background: conic-gradient(var(--cyan) var(--mist-percent), rgba(145, 168, 170, 0.16) 0);
+}
+.mist-meter::before { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: var(--panel); }
+.mist-meter .mist-reading { position: relative; z-index: 1; }
 
 .weather-details { margin-top: 12px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .weather-details summary { min-height: 50px; display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-weight: 650; list-style: none; }
@@ -190,8 +192,8 @@ section + section { margin-top: 58px; }
 .season-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 .season-chart text { fill: var(--muted); font-family: inherit; font-size: 11px; }
 .season-chart .grid { stroke: rgba(145, 168, 170, 0.13); stroke-width: 1; }
-.season-chart .baseline-path { fill: none; stroke: var(--cyan); stroke-width: 2; opacity: 0.65; }
-.season-chart .live-path { fill: none; stroke: var(--amber); stroke-width: 3; }
+.season-chart .baseline-path { fill: none; stroke: var(--cyan); stroke-width: 2; opacity: 0.65; stroke-linecap: round; stroke-linejoin: round; }
+.season-chart .live-path { fill: none; stroke: var(--amber); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .season-chart .range-band { fill: rgba(240, 179, 77, 0.13); }
 .season-chart .today-line { stroke: var(--ink); stroke-width: 1; opacity: 0.45; }
 .season-chart .axis-line { stroke: rgba(145, 168, 170, 0.28); stroke-width: 1; }
@@ -210,17 +212,40 @@ section + section { margin-top: 58px; }
 .empty-state { padding: 20px 0; color: var(--muted); }
 
 footer { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0 34px; border-top: 1px solid rgba(145, 168, 170, 0.16); color: var(--muted); font-size: 0.72rem; }
+.footer-links { display: flex; gap: 16px; }
 footer a { color: var(--cyan); text-underline-offset: 3px; }
 
 @media (min-width: 640px) {
   .site-header { min-height: 82px; }
   main { padding-top: 42px; }
-  .live-section { padding: 30px; border-radius: 28px; background: linear-gradient(135deg, rgba(14, 32, 39, 0.96), rgba(8, 21, 27, 0.9)); }
-  .primary-signals { max-width: 440px; }
   .weather-grid { grid-template-columns: repeat(4, 1fr); }
   .next-days { grid-template-columns: repeat(3, 1fr); }
   .day-card { grid-template-columns: 1fr; align-items: start; min-height: 188px; }
   .day-signals { justify-content: space-between; text-align: left; }
+}
+
+@media (min-width: 900px) {
+  .site-header,
+  main,
+  footer { width: min(100% - 64px, 1380px); }
+
+  .live-cards { grid-template-columns: 1.65fr 1fr 1fr; }
+  .today-card,
+  .signal { min-height: 310px; padding: 30px; }
+  .today-card { display: flex; flex-direction: column; }
+  .today-card .catch-context { margin-top: auto; }
+  .moon-icon { width: 6.5rem; height: 6.5rem; margin-top: 34px; }
+  .moon-signal strong { font-size: 1.4rem; }
+  .mist-signal { display: flex; flex-direction: column; }
+  .mist-reading strong { font-size: 3.4rem; }
+  .mist-meter { width: 140px; margin-top: auto; }
+  .weather-details { margin-inline: 2px; }
+  .season-chart { padding: 10px 20px 20px; border-radius: 24px; background: var(--panel-soft); }
+}
+
+@media (min-width: 1100px) {
+  .next-days { grid-template-columns: repeat(5, 1fr); }
+  .day-card { min-height: 176px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
