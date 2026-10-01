@@ -53,6 +53,8 @@ jobs:
         run: Rscript scripts/production/count/train.R
 
       - name: Fetch weather and predict count and mist
+        env:
+          NGULIA_PYTHON: python
         run: Rscript scripts/production/update_forecast.R
 
       - name: Archive issued forecast
