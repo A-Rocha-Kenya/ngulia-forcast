@@ -5,7 +5,9 @@ const dayMonth = new Intl.DateTimeFormat("en", { day: "numeric", month: "short",
 const longDate = new Intl.DateTimeFormat("en", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 const chartDate = new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 const monthName = new Intl.DateTimeFormat("en", { month: "short", timeZone: "UTC" });
-const demoMode = new URLSearchParams(window.location.search).get("demo") === "1";
+const exploreMode = /\/explore\/(?:index\.html)?$/.test(window.location.pathname) || new URLSearchParams(window.location.search).get("demo") === "1";
+document.querySelector(exploreMode ? "#nav-explore" : "#nav-live").setAttribute("aria-current", "page");
+document.title = `${exploreMode ? "Explore forecast" : "Live forecast"} | Ngulia`;
 
 const parseDate = value => new Date(`${value}T12:00:00Z`);
 
@@ -231,7 +233,7 @@ function renderSeasonChart(values, displayDate) {
 
 async function loadForecast() {
   try {
-    const dataFile = demoMode ? "forecast.demo.json" : "forecast.json";
+    const dataFile = exploreMode ? "forecast.demo.json" : "forecast.json";
     const response = await fetch(`data/${dataFile}?v=${Date.now()}`, { cache: "no-store" });
     if (!response.ok) throw new Error(`Forecast request failed: ${response.status}`);
     const data = await response.json();

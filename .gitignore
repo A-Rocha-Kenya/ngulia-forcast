@@ -5,6 +5,7 @@
 .venv-mist/
 .venv-forecast/
 __pycache__/
+site/explore/
 site/reports/
 site/count/
 site/mist/

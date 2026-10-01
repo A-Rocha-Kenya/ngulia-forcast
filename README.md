@@ -1,12 +1,12 @@
 # Ngulia daily forecast
 
-[Open the forecast website](https://a-rocha-kenya.github.io/ngulia-forcast/) · [View the demo](https://a-rocha-kenya.github.io/ngulia-forcast/?demo=1)
+[Open the forecast website](https://a-rocha-kenya.github.io/ngulia-forcast/) · [Explore the forecast](https://a-rocha-kenya.github.io/ngulia-forcast/explore/)
 
 The website predicts daily capture count and the probability of mist at Ngulia. Both models use the same issued Open-Meteo ECMWF hourly forecast, with separate inputs and predictions. The scheduled pipeline refreshes the website twice daily during the ringing season and archives issued forecasts for later assessment.
 
 ## Daily capture count
 
-**[Read the count model report](https://a-rocha-kenya.github.io/ngulia-forcast/count/model.html)** for the description of the full forecast model, its interactive effect plots and next-season validation.
+**[Understand the count model](https://a-rocha-kenya.github.io/ngulia-forcast/count/)** for the description of the full forecast model, its interactive effect plots and next-season validation.
 
 The forecast estimates the number of birds captured **assuming ringing takes place at front bush**. A negative-binomial generalized additive model combines season timing, moon phase, morning rain, wind, temperature, pressure, cloud cover and humidity. Historical net layout and a smooth year effect account for changes in capture level across the training record.
 
@@ -40,7 +40,7 @@ Rscript count/scripts/build_report.R
 
 ## Mist probability
 
-**[Read the mist model report](https://a-rocha-kenya.github.io/ngulia-forcast/mist/model.html)** for the model description, interactive figures, calibration and validation.
+**[Understand the mist model](https://a-rocha-kenya.github.io/ngulia-forcast/mist/)** for the model description, interactive figures, calibration and validation.
 
 The forecast gives the probability of **any recorded mist**, including light or patchy mist. It averages three small convolutional neural networks using hourly cloud cover, humidity, wind components, temperature and dew-point depression from **21:00 on the previous evening through 08:00 on the ringing date**, in Ngulia local time.
 
@@ -76,6 +76,10 @@ python3 scripts/publish_reports.py
 python3 -m http.server 8765 --directory site
 ```
 
-Open `http://localhost:8765/count/model.html` or `http://localhost:8765/mist/model.html`.
+Open `http://localhost:8765/count/` or `http://localhost:8765/mist/`.
+The main menu uses `/` (Live), `/explore/` (Explore), `/count/` (Count model),
+and `/mist/` (Mist model). Publishing generates the Explore page from the shared
+homepage and gives each model an `index.html`; the existing `model.html` links
+remain available.
 The deployment workflow already runs the publishing step; no Quarto or Vite build is
 needed for these existing `htmltools` reports.

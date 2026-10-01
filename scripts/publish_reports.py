@@ -7,6 +7,12 @@ import shutil
 root = Path(__file__).resolve().parents[1]
 github = 'https://github.com/A-Rocha-Kenya/ngulia-forcast/blob/main/'
 site = (root / 'site/index.html').read_text()
+explore = root / 'site/explore'
+explore.mkdir(exist_ok=True)
+(explore / 'index.html').write_text(site.replace('<head>', '<head>\n    <base href="../">', 1)
+    .replace('Live forecast | Ngulia', 'Explore forecast | Ngulia')
+    .replace('Daily bird capture and mist forecasts for the Ngulia ringing season.',
+             'Explore how dates and weather change the Ngulia bird capture and mist forecasts.'))
 header = re.search(r'<header\b.*?</header>', site, re.DOTALL).group()
 footer = re.search(r'<footer\b.*?</footer>', site, re.DOTALL).group()
 theme = dict(re.findall(r'--([\w-]+):\s*([^;]+);', (root / 'site/styles.css').read_text()))
@@ -67,15 +73,19 @@ for model in ('count', 'mist'):
         head += '\n<link rel="icon" href="../favicon.svg" type="image/svg+xml">'
         head += '\n<link rel="stylesheet" href="../styles.css">\n<link rel="stylesheet" href="../reports.css">'
         body = re.search(r'<body>(.*?)</body>', html, re.DOTALL).group(1)
-        body = body.replace('<main>', f'<main class="report-content"><p class="report-kicker">{model.title()} / Model assessment</p>', 1)
-        body = body.replace('<nav>', '<nav class="report-toc" aria-label="Report sections">')
+        label = f'{model.title()} model' if path.name == 'model.html' else f'{model.title()} model comparisons'
+        body = body.replace('<main>', f'<main class="report-content"><p class="report-kicker">{label}</p>', 1)
+        body = body.replace('<nav>', '<nav class="report-toc" aria-label="Page sections">')
+        body = body.replace('href="model.html"', 'href="./"')
         body = re.sub(r'(<script type="application/json" data-for="[^"]+">)(.*?)(</script>)', theme_widget, body, flags=re.DOTALL)
         navigation = re.sub(r'href="(?!https?://)([^"]*)"', r'href="../\1"', header)
-        navigation = navigation.replace(f'href="../{model}/model.html"', f'href="../{model}/model.html" aria-current="page"')
-        navigation = navigation.replace('Loading…', 'Model assessment')
+        navigation = navigation.replace(f'href="../{model}/"', f'href="../{model}/" aria-current="page"')
+        navigation = navigation.replace('Loading…', 'Model guide')
         # Keep widget dependencies in the head; publish one valid document shell.
         html = f'<!doctype html>\n<html lang="en"><head>{head}</head>\n<body class="report-page">\n{navigation}\n{body}\n{footer}\n</body></html>\n'
         (destination / path.name).write_text(html)
+        if path.name == 'model.html':
+            (destination / 'index.html').write_text(html)
     for directory in source.iterdir():
         if directory.is_dir():
             shutil.copytree(directory, destination / directory.name, dirs_exist_ok=True)
@@ -87,6 +97,6 @@ legacy.mkdir(exist_ok=True)
 for model in ('count', 'mist'):
     (legacy / f'{model}_model_report.html').write_text(
         f'<!doctype html><html lang="en"><head><meta charset="utf-8">'
-        f'<meta http-equiv="refresh" content="0;url=../{model}/model.html">'
-        f'<title>{model.title()} model report</title></head><body>'
-        f'<a href="../{model}/model.html">Open the {model} model report</a></body></html>')
+        f'<meta http-equiv="refresh" content="0;url=../{model}/">'
+        f'<title>{model.title()} model | Ngulia</title></head><body>'
+        f'<a href="../{model}/">Open the {model} model</a></body></html>')

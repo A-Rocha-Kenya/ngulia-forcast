@@ -213,7 +213,7 @@ weather_uncertainty <- weather_paired |>
   select(model, period, improved_seasons, deviance_difference, low, high)
 page <- tags$html(lang = "en", tags$head(tags$meta(charset = "utf-8"),
   tags$meta(name = "viewport", content = "width=device-width, initial-scale=1"),
-  tags$title("Ngulia count model alternatives and tests"), tags$style(HTML(css))),
+  tags$title("Count model comparisons | Ngulia"), tags$style(HTML(css))),
   tags$body(tags$main(
     tags$h1("Count model alternatives and tests"),
     tags$nav(tags$a(href = "model.html", "Published model"), tags$a(href = "#weather", "Weather tests"),
