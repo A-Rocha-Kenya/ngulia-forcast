@@ -3,7 +3,7 @@
   --ink: #eef7f6;
   --muted: #91a8aa;
   --dim: #60777a;
-  --night: #071117;
+  --night: #070b11;
   --panel: #0e2027;
   --panel-soft: #0b1a20;
   --line: #213d45;
@@ -21,14 +21,27 @@ body {
   min-width: 320px;
   color: var(--ink);
   background:
-    radial-gradient(circle at 100% 0%, rgba(91, 215, 210, 0.08), transparent 25rem),
-    var(--night);
+    linear-gradient(180deg, #081018 0%, #0b0f14 18%, #091019 48%, #070b11 100%);
+  position: relative;
+  isolation: isolate;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.45;
 }
 
 a { color: inherit; }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 115%, rgba(255, 231, 160, 0.32) 0%, rgba(247, 190, 58, 0.16) 20%, rgba(247, 190, 58, 0.045) 42%, transparent 65%),
+    radial-gradient(ellipse at 50% 100%, rgba(255, 213, 102, 0.09), transparent 62%);
+  filter: blur(28px);
+}
 
 .site-header,
 main,
@@ -69,6 +82,11 @@ footer {
 .brand small { display: block; }
 .brand strong { font-family: Georgia, serif; font-size: 1.05rem; line-height: 1; }
 .brand small { margin-top: 3px; color: var(--muted); font-size: 0.64rem; letter-spacing: 0.11em; text-transform: uppercase; }
+
+.site-nav { display: flex; align-items: center; gap: 4px; margin-inline: auto; }
+.site-nav a { padding: 8px 12px; border-radius: 8px; color: var(--muted); font-size: 0.82rem; text-decoration: none; white-space: nowrap; }
+.site-nav a:hover, .site-nav a:focus-visible { color: var(--ink); background: var(--panel); }
+.site-nav a[aria-current="page"] { color: var(--cyan); background: rgba(91, 215, 210, 0.08); }
 
 .update-state {
   max-width: 155px;
@@ -211,9 +229,17 @@ section + section { margin-top: 58px; }
 
 .empty-state { padding: 20px 0; color: var(--muted); }
 
-footer { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0 34px; border-top: 1px solid rgba(145, 168, 170, 0.16); color: var(--muted); font-size: 0.72rem; }
-.footer-links { display: flex; gap: 16px; }
-footer a { color: var(--cyan); text-underline-offset: 3px; }
+footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0 22px; border-top: 1px solid rgba(145, 168, 170, 0.12); color: var(--dim); font-size: 0.72rem; }
+.github-link { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); text-decoration: none; }
+.github-link svg { width: 17px; height: 17px; fill: currentColor; }
+.github-link:hover, .github-link:focus-visible { color: var(--ink); }
+
+@media (max-width: 899px) {
+  .site-header { flex-wrap: wrap; padding-block: 16px 10px; gap: 14px; }
+  .site-nav { order: 3; width: 100%; justify-content: center; }
+  .site-nav a { padding: 8px 10px; }
+  .update-state { margin-left: auto; }
+}
 
 @media (min-width: 640px) {
   .site-header { min-height: 82px; }

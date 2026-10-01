@@ -64,3 +64,18 @@ The ERA5 hourly ZIP is stored locally in `raw-data/` (excluded from Git), copied
 </details>
 
 `mist/` owns its scripts, model artifacts, intermediate data and report (`mist/reports/model.html`). The shared `scripts/update_forecast.R` fetches weather and runs both models; `scripts/publish_reports.py` includes their saved HTML reports in the website. Model training and validation run separately from the daily forecast refresh.
+
+The published reports reuse the header, navigation and footer from `site/index.html`
+and the theme variables in `site/styles.css`. `site/reports.css` provides the report
+layout, tables and responsive figures. Publishing also applies the shared palette to
+Plotly widgets while preserving their data and interactivity. Refresh the website
+copies after rebuilding a report or editing the shared menu or palette:
+
+```sh
+python3 scripts/publish_reports.py
+python3 -m http.server 8765 --directory site
+```
+
+Open `http://localhost:8765/count/model.html` or `http://localhost:8765/mist/model.html`.
+The deployment workflow already runs the publishing step; no Quarto or Vite build is
+needed for these existing `htmltools` reports.
