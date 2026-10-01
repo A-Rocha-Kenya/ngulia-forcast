@@ -42,6 +42,7 @@ jobs:
           extra-packages: any::cli, any::dplyr, any::here, any::jsonlite, any::lubridate, any::mgcv, any::readr, any::tibble, any::tidyr
 
       - name: Set up Python for mist inference
+        id: mist-python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -54,7 +55,7 @@ jobs:
 
       - name: Fetch weather and predict count and mist
         env:
-          NGULIA_PYTHON: python
+          NGULIA_PYTHON: ${{ steps.mist-python.outputs.python-path }}
         run: Rscript scripts/production/update_forecast.R
 
       - name: Archive issued forecast
