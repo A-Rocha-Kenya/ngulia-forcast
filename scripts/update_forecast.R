@@ -13,7 +13,7 @@ count_model <- readRDS(here("count", "model", "model.rds"))
 demo_mode <- identical(Sys.getenv("NGULIA_DEMO"), "1")
 output_path <- here("site", "data", if (demo_mode) "forecast.demo.json" else "forecast.json")
 local_timezone <- "Africa/Nairobi"
-today_local <- as.Date(with_tz(Sys.time(), local_timezone))
+today_local <- as.Date(Sys.time(), tz = local_timezone)
 reference_new_moon <- ymd_hms("2000-01-06 18:14:00", tz = "UTC")
 synodic_month_days <- 29.530588853
 
@@ -53,7 +53,7 @@ api_url <- paste0("https://api.open-meteo.com/v1/ecmwf?",
 response <- fromJSON(api_url, simplifyVector = TRUE)
 hourly <- as_tibble(response$hourly) |>
   mutate(datetime = ymd_hm(time, tz = local_timezone),
-    weather_valid_date = as.Date(datetime), hour = hour(datetime),
+    weather_valid_date = as.Date(datetime, tz = local_timezone), hour = hour(datetime),
     cloud = cloud_cover / 100, humidity = relative_humidity_2m,
     u = -wind_speed_10m * sin(wind_direction_10m * pi / 180),
     v = -wind_speed_10m * cos(wind_direction_10m * pi / 180),
@@ -84,10 +84,12 @@ mist_hours <- hourly |>
   filter(hour %in% c(21:23, 0:8)) |>
   mutate(mist_date = weather_valid_date + as.integer(hour >= 21),
     relative_hour = if_else(hour >= 21, hour - 24L, hour)) |>
+  group_by(mist_date) |> filter(n() == 12) |> ungroup() |>
   semi_join(daily_weather, by = c("mist_date" = "weather_valid_date")) |>
   arrange(mist_date, relative_hour) |>
   select(weather_valid_date = mist_date, hour = relative_hour,
     cloud, humidity, u, v, temperature, depression)
+daily_weather <- semi_join(daily_weather, mist_hours, by = "weather_valid_date")
 stopifnot(nrow(mist_hours) == 12 * nrow(daily_weather),
   all(complete.cases(mist_hours)))
 mist_input <- tempfile(fileext = ".csv")
