@@ -86,6 +86,20 @@
       </a>
     </footer>
 
+    <dialog id="season-modal" class="season-modal" aria-labelledby="season-modal-title" aria-describedby="season-modal-message">
+      <form method="dialog">
+        <button class="modal-close" aria-label="Close season message" value="close">×</button>
+        <span class="modal-kicker">Ngulia forecast</span>
+        <h2 id="season-modal-title">Outside the ringing season</h2>
+        <p id="season-modal-message"></p>
+        <p>Explore dates and weather to see how the predictions change before the next season.</p>
+        <div class="modal-actions">
+          <a class="modal-primary" href="explore/" autofocus>Explore the forecast <span aria-hidden="true">→</span></a>
+          <button class="modal-secondary" value="close">View season outlook</button>
+        </div>
+      </form>
+    </dialog>
+
     <script src="app.js" type="module"></script>
   </body>
 </html>

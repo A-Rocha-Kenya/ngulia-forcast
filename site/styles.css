@@ -348,3 +348,18 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 #calendar-expand svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 150ms ease; }
 #calendar-expand[aria-expanded="true"] svg { transform: rotate(180deg); }
 .effect-plot:focus-visible { outline: 1px solid var(--amber); outline-offset: 3px; border-radius: 8px; }
+
+.season-modal { width: min(480px, calc(100% - 36px)); padding: 32px; border: 1px solid var(--line); border-radius: 22px; color: var(--ink); background: var(--panel); box-shadow: 0 24px 90px rgba(0, 0, 0, 0.45); }
+.season-modal::backdrop { background: rgba(7, 17, 23, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.season-modal form { margin: 0; }
+.modal-close { position: absolute; top: 10px; right: 12px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.5rem; cursor: pointer; }
+.modal-close:hover { color: var(--ink); background: var(--panel-soft); }
+.modal-kicker { color: var(--cyan); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.season-modal h2 { margin: 14px 0 18px; font-family: Georgia, serif; font-size: 2rem; line-height: 1.1; font-weight: 500; }
+.season-modal p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+.modal-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 24px; }
+.modal-primary, .modal-secondary { padding: 10px 14px; border-radius: 9px; font: inherit; font-size: 0.82rem; text-decoration: none; cursor: pointer; }
+.modal-primary { display: flex; align-items: center; gap: 12px; color: var(--night); background: var(--cyan); font-weight: 650; }
+.modal-secondary { border: 1px solid var(--line); color: var(--muted); background: transparent; }
+.modal-primary:hover { background: #87e5e1; }
+.modal-secondary:hover { color: var(--ink); border-color: var(--muted); }

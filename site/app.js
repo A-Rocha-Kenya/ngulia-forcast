@@ -249,7 +249,12 @@ async function loadForecast() {
     renderNextDays(data.forecast.slice(1, 6));
     const displayDate = new Date().toLocaleDateString("en-CA", { timeZone: data.source.timezone });
     renderSeasonChart(data.season_outlook || [], displayDate);
-
+    const monthDay = displayDate.slice(5);
+    if (monthDay > "01-12" && monthDay < "10-20") {
+      const nextStart = `${displayDate.slice(0, 4)}-10-20`;
+      document.querySelector("#season-modal-message").textContent = `The ringing season runs from 20 October to 12 January. The next season starts ${chartDate.format(parseDate(nextStart))}.`;
+      document.querySelector("#season-modal").showModal();
+    }
   } catch (error) {
     document.querySelector("#update-label").textContent = "Unavailable";
     document.querySelector("#primary-date").textContent = "Forecast unavailable";
