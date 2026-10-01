@@ -25,7 +25,19 @@ node scripts/verify_javascript.mjs
 Rscript scripts/update_forecast.R
 ```
 
-The shared update script writes `site/data/forecast.json`. Set `NGULIA_DEMO=1` to write example in-season dates using current weather. [Data provenance](raw-data/provenance.md) describes the curated snapshot and eligibility rules.
+The shared update script writes `site/data/forecast.json`. The Explore page at `/explore/` runs interactively from the exported model files; it does not shift issued weather onto invented dates. [Data provenance](raw-data/provenance.md) describes the curated snapshot and eligibility rules.
+
+## Explore the forecast and shared prediction
+
+Choose a date using the date picker or the season calendar. Expand the calendar to compare ten seasons; its curves use timing and moon effects with fixed typical weather. Weather plots show fitted catch effects and observed distributions. Drag the plot markers to change the scenario; focused figures also respond to arrow keys. Rain uses a log(1 + rain) x axis to include dry conditions. The catch estimate, 80% count range and mist probability update together; the moon card is omitted. Reset restores typical weather, and a copied scenario URL preserves the date and all selected inputs.
+
+`site/prediction.js` is the single count and mist prediction implementation used by the browser and the daily update via `scripts/predict.mjs`. R and Python retain model fitting and research validation. `scripts/export_models.R` writes versioned model artifacts to `site/models/`: count effects sampled at 2,001 points with linear interpolation, and the unchanged frozen CNN weights and preprocessing. Front-bush layout and the 2023 year effect remain fixed. JavaScript implements the same negative-binomial count quantiles. Export uses exact GAM prediction (`discrete = FALSE`), avoiding the small batch-dependent approximation from `bam`'s default discretized prediction.
+
+Plot controls cover observed training ranges. Wind speed and direction jointly change the two wind components; their combined effect curves do not show a confidence band. Other shaded bands are 95% marginal fitted-effect intervals, distinct from the 80% predictive count range. Independently selected conditions need not represent an observed weather combination. Mist uses a hypothetical constant 12-hour profile from 21:00–08:00 and derives dew-point depression from temperature and humidity. Date, pressure and rain do not enter the CNN.
+
+The workflow regenerates model artifacts after training and checks JavaScript against 1,548 R prediction cases (observed covariates, random combinations, and issued-weather extrapolation) plus frozen NumPy mist references before publishing. For the larger 200-night mist comparison, run `python3 scripts/export_mist_reference.py` (NumPy required) and `node scripts/verify_javascript.mjs --full`. Prediction references are verification data, not a second production implementation.
+
+The forecast update groups weather by Ngulia local date and includes only dates with complete 00:00–08:00 count inputs and a complete 21:00–08:00 mist window. A date can be omitted when the weather response lacks the previous evening. The Explore page does not correct the separate ERA5/issued-weather elevation mismatch or the historical UTC/local-date grouping issue; those require a coordinated data rebuild and model assessment.
 
 <details>
 <summary>Reproduce the count model report</summary>

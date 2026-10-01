@@ -13,6 +13,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html { background: var(--night); }
 
@@ -142,11 +143,17 @@ section + section { margin-top: 58px; }
 
 .today-card,
 .signal {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   min-width: 0;
   padding: 22px;
   border-radius: 20px;
   background: linear-gradient(135deg, rgba(14, 32, 39, 0.98), rgba(8, 21, 27, 0.94));
 }
+
+.forecast-animation { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; border-radius: inherit; }
+.today-card, .mist-signal { box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 222, 148, 0.035); }
 
 .today-card { min-height: 252px; }
 .signal { min-height: 188px; }
@@ -277,3 +284,67 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; }
 }
+
+/* Forecast sandbox ------------------------------------------------------ */
+.sandbox-mode .live-section { position: sticky; top: 0; z-index: 2; padding-block: 10px; background: var(--night); }
+.sandbox-mode .live-cards { grid-template-columns: 1.8fr 1fr; }
+.sandbox-mode .today-card, .sandbox-mode .signal { min-height: 200px; padding: 22px; }
+.sandbox-mode .live-date { margin-top: 12px; }
+.sandbox-mode .catch-value { font-size: clamp(3.5rem, 12vw, 6rem); }
+.sandbox-mode .catch-range { margin-top: 18px; font-size: 0.95rem; }
+.sandbox-mode .catch-context { font-size: 0.78rem; }
+.sandbox-mode .mist-meter { width: 105px; margin-top: 16px; }
+.sandbox-controls { margin-top: 30px; }
+.sandbox-controls h2 { margin: 0; font-family: Georgia, serif; font-size: 2rem; font-weight: 500; }
+.sandbox-intro p, .sandbox-note { color: var(--muted); font-size: 0.85rem; }
+.calendar-heading, .weather-heading { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; margin-block: 24px 12px; }
+.calendar-heading label { display: grid; gap: 6px; color: var(--muted); font-size: 0.8rem; }
+.sandbox-controls input[type="date"], .sandbox-controls select, .sandbox-controls button { padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font: inherit; }
+.sandbox-controls button { cursor: pointer; font-size: 0.82rem; }
+.sandbox-controls button:hover, .sandbox-controls button:focus-visible { border-color: var(--cyan); }
+.sandbox-calendar { overflow-x: auto; padding-block: 8px; }
+.sandbox-calendar svg { display: block; width: 100%; min-width: 720px; }
+.sandbox-calendar text { fill: var(--muted); font: 11px system-ui, sans-serif; }
+.calendar-guide { stroke: rgba(238, 247, 246, 0.2); pointer-events: none; }
+.december-guide { stroke: rgba(238, 247, 246, 0.8); stroke-dasharray: 2 4; pointer-events: none; }
+.calendar-curve { stroke: rgba(7, 17, 23, 0.65); stroke-width: 1.5; fill: none; pointer-events: none; }
+.sandbox-calendar .new-moon { fill: white; stroke: #14252c; stroke-width: 0.4; font-size: 14px; pointer-events: none; }
+.selected-day { fill: rgba(255,255,255,0.13); stroke: white; stroke-width: 2; pointer-events: none; }
+.calendar-hit { fill: transparent; cursor: crosshair; }
+.calendar-row:focus-visible .calendar-hit { stroke: var(--amber); stroke-width: 2; }
+.calendar-key { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 0.74rem; color: var(--muted); }
+.calendar-key i { width: 100px; height: 9px; background: linear-gradient(90deg, #142838, #2d939e, #f6cb5b, #f3854d); }
+.calendar-key span:last-child { margin-left: 10px; }
+.weather-heading { justify-content: space-between; margin-top: 44px; }
+.sandbox-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.scenario-weather { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+.effect-card { min-width: 0; padding: 18px; border-radius: 16px; background: var(--panel-soft); }
+.effect-heading { display: flex; justify-content: space-between; gap: 10px; font-size: 0.86rem; }
+.effect-heading > span { font-weight: 650; }
+.effect-heading output { color: var(--amber); font-variant-numeric: tabular-nums; }
+.effect-plot { width: 100%; margin-top: 12px; touch-action: none; cursor: ew-resize; }
+.effect-plot text { fill: var(--muted); font: 11px system-ui, sans-serif; }
+.effect-grid { stroke: var(--line); }
+.effect-reference { stroke: var(--muted); stroke-dasharray: 3 4; }
+.effect-curve { fill: none; stroke: var(--cyan); stroke-width: 2; }
+.effect-band { fill: rgba(91, 215, 210, 0.12); }
+.histogram-bar { fill: rgba(145, 168, 170, 0.35); }
+.effect-selection { stroke: var(--amber); stroke-width: 2; }
+.effect-handle { fill: var(--amber); stroke: var(--night); stroke-width: 2; }
+.effect-hit { fill: transparent; }
+.model-version a { color: var(--cyan); }
+@media (min-width: 1100px) { .scenario-weather { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 639px) {
+  .scenario-weather { grid-template-columns: 1fr; }
+  .sandbox-mode .today-card, .sandbox-mode .signal { padding: 16px; min-height: 170px; }
+  .sandbox-mode .mist-meter { width: 80px; }
+  .sandbox-mode .catch-unit { font-size: 0.72rem; }
+  .sandbox-mode .catch-context { display: none; }
+  .sandbox-mode .catch-range { font-size: 0.76rem; }
+  .sandbox-mode .live-date { font-size: 0.8rem; }
+}
+
+#calendar-expand { display: inline-flex; align-items: center; gap: 14px; color: var(--cyan); border-radius: 999px; background: rgba(91, 215, 210, 0.06); }
+#calendar-expand svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 150ms ease; }
+#calendar-expand[aria-expanded="true"] svg { transform: rotate(180deg); }
+.effect-plot:focus-visible { outline: 1px solid var(--amber); outline-offset: 3px; border-radius: 8px; }

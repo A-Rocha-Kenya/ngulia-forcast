@@ -1,3 +1,6 @@
+import { loadSandbox } from "./sandbox.js";
+import { updateForecastVisuals } from "./card-animation.js";
+
 const whole = new Intl.NumberFormat("en", { maximumFractionDigits: 0 });
 const oneDecimal = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
 const weekday = new Intl.DateTimeFormat("en", { weekday: "short", timeZone: "UTC" });
@@ -65,6 +68,7 @@ function weatherMarkup(day) {
 }
 
 function setLive(day) {
+  updateForecastVisuals(day?.expected_catch ?? 0, day?.mist_probability_pct ?? 0);
   if (!day) {
     document.querySelector("#primary-date").textContent = "Outside the forecast window";
     document.querySelector("#primary-catch").textContent = "—";
@@ -233,23 +237,19 @@ function renderSeasonChart(values, displayDate) {
 
 async function loadForecast() {
   try {
-    const dataFile = exploreMode ? "forecast.demo.json" : "forecast.json";
-    const response = await fetch(`data/${dataFile}?v=${Date.now()}`, { cache: "no-store" });
+    if (exploreMode) { await loadSandbox(); return; }
+    const response = await fetch(`data/forecast.json?v=${Date.now()}`, { cache: "no-store" });
     if (!response.ok) throw new Error(`Forecast request failed: ${response.status}`);
     const data = await response.json();
     const generated = new Date(data.generated_at);
-    document.body.classList.toggle("demo-mode", Boolean(data.demo_mode));
-    document.querySelector("#update-label").textContent = data.demo_mode
-      ? "Demo · live weather"
-      : data.forecast.length
+    document.querySelector("#update-label").textContent = data.forecast.length
         ? `ECMWF live · updated ${generated.toLocaleString("en", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`
         : `Forecast starts ${dayMonth.format(parseDate(data.status.next_season_start))}`;
     setLive(data.forecast[0]);
     renderNextDays(data.forecast.slice(1, 6));
-    const displayDate = data.demo_mode && data.forecast.length
-      ? data.forecast[0].date
-      : new Date().toLocaleDateString("en-CA", { timeZone: data.source.timezone });
+    const displayDate = new Date().toLocaleDateString("en-CA", { timeZone: data.source.timezone });
     renderSeasonChart(data.season_outlook || [], displayDate);
+
   } catch (error) {
     document.querySelector("#update-label").textContent = "Unavailable";
     document.querySelector("#primary-date").textContent = "Forecast unavailable";

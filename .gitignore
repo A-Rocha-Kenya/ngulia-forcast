@@ -5,6 +5,8 @@
 .venv-mist/
 .venv-forecast/
 __pycache__/
+.playwright-cli/
+output/playwright/
 site/explore/
 site/reports/
 site/count/
