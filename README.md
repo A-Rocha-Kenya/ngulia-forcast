@@ -44,7 +44,7 @@ Rscript count/scripts/build_report.R
 
 The forecast gives the probability of **any recorded mist**, including light or patchy mist. It averages three small convolutional neural networks using hourly cloud cover, humidity, wind components, temperature and dew-point depression from **21:00 on the previous evening through 08:00 on the ringing date**, in Ngulia local time.
 
-Training uses 1,184 observed dates in 43 seasons through 2013. Five whole-season validation folds give a **Brier score of 0.1675** and **AUC of 0.8103**, compared with a Brier score of 0.1845 for logistic regression using average weather. The report includes fold, calibration and mist-category diagnostics; [selection notes](mist/selection_notes.md) explain the tested windows and variants.
+Training uses 1,184 observed dates in 43 seasons through 2013. Five whole-season validation folds give a **Brier score of 0.1675** and **AUC of 0.8103**, compared with a Brier score of 0.1845 for logistic regression using average weather. The model guide explains the comparison and probability calibration, with detailed validation scores available to expand; [selection notes](mist/selection_notes.md) explain the tested windows and variants.
 
 The network weights and preprocessing metadata are saved in `mist/model/`. The shared forecast update runs them through `mist/scripts/predict.py` using NumPy; daily inference needs no neural-network training. Mist probability is displayed independently of the count estimate.
 
