@@ -6,6 +6,7 @@ model/*.rds
 validation/research/*.rds
 
 .venv-mist/
+.venv-forecast/
 __pycache__/
 validation/research/mist/*.rds
 validation/research/mist/artifacts/*.npz

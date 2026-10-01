@@ -48,14 +48,17 @@ jobs:
           python-version: "3.12"
 
       - name: Install mist inference dependency
-        run: python -m pip install numpy
+        run: |
+          "${{ steps.mist-python.outputs.python-path }}" -m venv .venv-forecast
+          .venv-forecast/bin/python -m pip install numpy
+          .venv-forecast/bin/python -c "import numpy; print(numpy.__version__)"
 
       - name: Train count M2
         run: Rscript scripts/production/count/train.R
 
       - name: Fetch weather and predict count and mist
         env:
-          NGULIA_PYTHON: ${{ steps.mist-python.outputs.python-path }}
+          NGULIA_PYTHON: ${{ github.workspace }}/.venv-forecast/bin/python
         run: Rscript scripts/production/update_forecast.R
 
       - name: Archive issued forecast
