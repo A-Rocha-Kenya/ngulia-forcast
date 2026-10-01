@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+<script src="lib/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="lib/plotly-binding-4.12.1/plotly.js"></script>
+<script src="lib/typedarray-0.1/typedarray.min.js"></script>
+<script src="lib/jquery-3.5.1/jquery.min.js"></script>
+<link href="lib/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="lib/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="lib/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="lib/plotly-main-2.25.2/plotly-latest.min.js"></script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Ngulia count model alternatives and tests</title>
+  <style>html{scroll-behavior:smooth}body{margin:0;background:#fff;color:#243137;font:16px/1.55 Arial,Helvetica,sans-serif}main{max-width:1060px;margin:0 auto;padding:28px 24px 60px}h1{font-size:2rem;line-height:1.25}h2{margin:40px 0 18px;border-bottom:1px solid #ddd;padding-bottom:10px}h3{font-size:1.05rem;margin:24px 0 10px}nav{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:25px}a{color:#167b75}ul{padding-left:23px}li{margin:6px 0}.equation{padding:16px;background:#f5f7f8;overflow-x:auto;margin:18px 0}math{font-size:1.12rem}.table-scroll{overflow-x:auto;margin:18px 0}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{padding:9px 12px;text-align:left;border-bottom:1px solid #ddd}th{background:#f5f7f8;white-space:nowrap}.caption{font-size:.9rem;color:#56636a}.chart{display:block;width:100%;min-width:0;margin:0 0 22px;overflow:hidden}.chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}.html-widget{display:block;max-width:100%}.chart-grid .chart{margin-bottom:18px}@media(max-width:750px){main{padding:20px 12px}.chart-grid{grid-template-columns:1fr}h1{font-size:1.6rem}}</style>
+</head>
+<html lang="en">
+  <body>
+    <main>
+      <h1>Count model alternatives and tests</h1>
+      <nav>
+        <a href="model.html">Published model</a>
+        <a href="#weather">Weather tests</a>
+        <a href="#m3a">Annual random intercept</a>
+        <a href="#m3b">Recent annual baseline</a>
+        <a href="#validation">Comparisons</a>
+        <a href="#live">Live annual updates</a>
+      </nav>
+      <p>Exploratory alternatives to the published count model. Historical identifiers below refer to the benchmark (M2), an annual random intercept (M3a), and a recent annual baseline with live updates (M3b). The benchmark here extrapolates its year spline; the published model's held-year rule is assessed separately in its description and validation page.</p>
+      <p>In these retrospective tests, M2 extrapolates its historical smooth-year trend. The live forecast holds that term at 2023 for later seasons. M3a adds a random annual deviation but has no information about an unseen year's direction. M3b shares M2's fitted weather response, removes the year smooth from the forecast, uses recent adjusted annual levels for the new-year baseline, and updates that baseline as counts arrive.</p>
+      <p>In 2014–2023 forward tests, M3b's one-year deviance was 504.0 versus 522.7 for M2. At two and three years ahead it was 518.4 versus 509.7 and 520.3 versus 518.9. These historical ERA5 results are exploratory; none assesses issued-weather errors.</p>
+      <h2 id="weather">M2 + prior-morning rain · Rolling next-year tests</h2>
+      <p>Every tested weather input can be requested from the Open-Meteo ECMWF feed or derived from its hourly values. M2 uses eight daily weather inputs and has no cloud-base term. Only 2014–2023 seasons are evaluated here; earlier seasons can still enter each model's training set. Every test season is fitted only on earlier years and all candidates predict the same operated dates using historical ERA5 weather.</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Candidate</th>
+              <th>Dates</th>
+              <th>Deviance ↓</th>
+              <th>Mean absolute error ↓</th>
+              <th>Predicted mean</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>M2</td>
+              <td>142</td>
+              <td>522.72</td>
+              <td>483.09</td>
+              <td>810.28</td>
+            </tr>
+            <tr>
+              <td>M2 + prior-morning rain</td>
+              <td>142</td>
+              <td>496.44</td>
+              <td>463.57</td>
+              <td>740.70</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>On recent dates, M2 has deviance 522.7 and mean absolute error 483 birds per date. Adding prior-morning rain gives 496.4 and 464. These are paired comparisons on the same held-out dates.</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Candidate</th>
+              <th>Test period</th>
+              <th>Seasons improved</th>
+              <th>Deviance difference</th>
+              <th>95% lower</th>
+              <th>95% upper</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Prior-morning rain</td>
+              <td>2014–2023</td>
+              <td>6</td>
+              <td>-26.28</td>
+              <td>-64.60</td>
+              <td>12.76</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="chart">
+        <div id="htmlwidget-000554772cfdf881343f" style="width:100%;height:350px;" class="plotly html-widget"></div>
+        <script type="application/json" data-for="htmlwidget-000554772cfdf881343f">{"x":{"visdat":{"132dd4c78cc4c":["function () ","plotlyVisDat"]},"cur_data":"132dd4c78cc4c","attrs":{"132dd4c78cc4c":{"x":{},"y":{},"marker":{"color":"#167b75"},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Forecast season","tickmode":"linear","dtick":1},"yaxis":{"domain":[0,1],"automargin":true,"title":"Prior-morning rain − M2 deviance (lower is better)"},"showlegend":false,"hovermode":"closest","height":350},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":[2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],"y":[-94.874436723726944,43.409229551874205,-128.20722910772224,60.000447410047173,-66.348030535183398,-68.756464829641061,-10.348348845628664,-26.411988697893094,45.884355929924311,8.7550300717646792],"marker":{"color":"#167b75","line":{"color":"rgba(31,119,180,1)"}},"type":"bar","error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+      </div>
+      <p class="caption">Each bar is prior-morning rain minus M2 for one fully held-out season. Negative bars favor rain. The paired season-bootstrap interval conditions on this already explored candidate.</p>
+      <p>
+        Earlier cloud, overnight and hourly CNN screens are summarized in 
+        <a href="../selection_notes.md">the contender notes</a>
+        .
+      </p>
+      <p>
+        Operational audit: a live query for Ngulia returned temperature, humidity, precipitation, pressure, cloud and wind, including yesterday when requested with past_days=1. The API accepted a cloud_base field name but returned only null values, so cloud base was excluded from all active count models. See 
+        <a href="https://open-meteo.com/en/docs/ecmwf-api">ECMWF API documentation</a>
+        .
+      </p>
+      <p>
+        Historical issued forecasts are for operational evaluation, not required to train these models: the fits above use ERA5 and observed counts. Open-Meteo's archived ECMWF individual runs start in March 2024, after the latest count labels in this dataset, so they cannot reconstruct the 2014–2023 forecasts as issued. The scheduled website workflow archives its selected M2 forecast; later count observations are still needed to score issued-weather accuracy. See 
+        <a href="https://open-meteo.com/en/docs/single-runs-api">Single Runs API availability</a>
+        .
+      </p>
+      <p>Decision: the full model, with its year term held at the last training season, remains the published count model. Prior-morning rain improves the retrospective average, but its season-level interval includes no gain. Revisit it after obtaining new observed counts and comparable issued forecasts. Older years remain useful for fitting, but are not part of the weather-model choice score here.</p>
+      <h2 id="m3a">M3a · Smooth year plus annual random intercept</h2>
+      <div class="equation"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>η</mi><mtext>3a</mtext></msub><mo>=</mo><msub><mi>η</mi><mn>2</mn></msub><mo>+</mo><msub><mi>b</mi><mi>y</mi></msub><mo>,</mo><mspace width="1em"/><msub><mi>b</mi><mi>y</mi></msub><mo>∼</mo><mi>N</mi><mo>(</mo><mn>0</mn><mo>,</mo><msubsup><mi>σ</mi><mtext>year</mtext><mn>2</mn></msubsup><mo>)</mo></math></div>
+      <p>M3a retains M2's weather, layout and smooth year trend, then adds a partially pooled annual intercept. The fitted annual log-scale SD is 0.38. That intercept may combine effort, population variation and other annual changes.</p>
+      <div class="chart">
+        <div id="htmlwidget-c880ffd89dffbd0cc44f" style="width:100%;height:360px;" class="plotly html-widget"></div>
+        <script type="application/json" data-for="htmlwidget-c880ffd89dffbd0cc44f">{"x":{"visdat":{"132dd3ddb10e8":["function () ","plotlyVisDat"]},"cur_data":"132dd3ddb10e8","attrs":{"132dd3ddb10e8":{"x":{},"y":{},"mode":"markers","marker":{"color":"#a04d86","size":8},"error_y":{"type":"data","symmetric":false,"array":[0.41489940697801253,0.54527506388013824,0.63458915757317946,0.48997100942236016,0.70175824465318648,0.47272475719580431,0.61670156749235416,0.38500573890738188,0.79180890484229627,0.64746964576472799,0.43552901398750699,0.88338043768833407,0.40243293420558879,1.1348626938370105,0.51461792855542476,0.74534170681557854,0.65090498430194632,0.32099070860426626,0.44130718855539708,0.56568920585629368,0.41368732522771801,0.51205894898554161,0.63322084068380069,0.5521252298571675,0.44360451686971203,0.44779784696404368,0.4206860418643853,0.75521820298935083,0.87943297739470294,0.40982494709804385,0.66920072915319917,0.54420224712761101,0.27624868250059131,0.88994818441398515,0.62904144525743555,0.40274869038719152,0.78293064666898826,0.43866745610235924,0.54141072832606063,0.58366937711964617,0.83552219050380572,0.5609986562285223,0.46316672784661561,0.69750649189884384,0.67376250446479302,0.59979755109495814,0.61004573035744714],"arrayminus":[0.26619548859196607,0.36085305084549024,0.42053701983123515,0.3239362117011797,0.43956254481240342,0.29541245180346876,0.35437047276401945,0.23852523301603279,0.49790728784997884,0.42361704712591863,0.25969110534734591,0.54410456202867974,0.26257175397265337,0.75273347729397089,0.3394840239534106,0.45844576343240007,0.43788041243099785,0.19969563439998161,0.29134376262733808,0.3755960161281694,0.2697188357576864,0.34242402488301815,0.42528281226275244,0.36850059940162372,0.29708623233896403,0.29725020285884918,0.28701490362471538,0.51783008982141276,0.58510006400663905,0.26601799269596776,0.44587389174334924,0.3458483018967734,0.18247975089746293,0.57061876624351404,0.39306312575270763,0.26992655831522938,0.51017043555290165,0.2697786068841897,0.32600448336769794,0.35889798654253247,0.53220349536764666,0.34920686696310987,0.28499210306124628,0.42532875374587242,0.39047256634666661,0.36111257858434553,0.36139716400263167]},"text":{},"hoverinfo":"text","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Season"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Deviation from smooth annual level"},"hovermode":"closest","showlegend":false,"height":360},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":[1977,1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],"y":[0.742713114460825,1.0669234497193707,1.2467440687967735,0.95594028971093881,1.1764748241491174,0.78758650868823754,0.83307251949256833,0.62693382321815638,1.3414265234062843,1.2252668993361728,0.64322313617089355,1.4166976217173828,0.75551715790425966,2.2354981111132126,0.99754850770657277,1.1910197954339936,1.3379608768898001,0.52846699350107917,0.85735635867575277,1.1177181696525389,0.77502559163377027,1.0336390764853662,1.2950874929144602,1.1080130026259389,0.89946995344265268,0.88415864386963883,0.90328522186651272,1.6474064546445071,1.7482118647219442,0.75810526853198501,1.3360648318206279,0.94886654681084603,0.53759587431172606,1.5902735736670157,1.0477784451547227,0.81848232795480702,1.464392725700143,0.70071585981292961,0.8193927934252031,0.93195919514902914,1.4660086482428896,0.92498667578927796,0.74083983617762539,1.0899846877346528,0.92868026296374673,0.90744900286860608,0.88666828083976057],"mode":"markers","marker":{"color":"#a04d86","size":8,"line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)","type":"data","symmetric":false,"array":[0.41489940697801253,0.54527506388013824,0.63458915757317946,0.48997100942236016,0.70175824465318648,0.47272475719580431,0.61670156749235416,0.38500573890738188,0.79180890484229627,0.64746964576472799,0.43552901398750699,0.88338043768833407,0.40243293420558879,1.1348626938370105,0.51461792855542476,0.74534170681557854,0.65090498430194632,0.32099070860426626,0.44130718855539708,0.56568920585629368,0.41368732522771801,0.51205894898554161,0.63322084068380069,0.5521252298571675,0.44360451686971203,0.44779784696404368,0.4206860418643853,0.75521820298935083,0.87943297739470294,0.40982494709804385,0.66920072915319917,0.54420224712761101,0.27624868250059131,0.88994818441398515,0.62904144525743555,0.40274869038719152,0.78293064666898826,0.43866745610235924,0.54141072832606063,0.58366937711964617,0.83552219050380572,0.5609986562285223,0.46316672784661561,0.69750649189884384,0.67376250446479302,0.59979755109495814,0.61004573035744714],"arrayminus":[0.26619548859196607,0.36085305084549024,0.42053701983123515,0.3239362117011797,0.43956254481240342,0.29541245180346876,0.35437047276401945,0.23852523301603279,0.49790728784997884,0.42361704712591863,0.25969110534734591,0.54410456202867974,0.26257175397265337,0.75273347729397089,0.3394840239534106,0.45844576343240007,0.43788041243099785,0.19969563439998161,0.29134376262733808,0.3755960161281694,0.2697188357576864,0.34242402488301815,0.42528281226275244,0.36850059940162372,0.29708623233896403,0.29725020285884918,0.28701490362471538,0.51783008982141276,0.58510006400663905,0.26601799269596776,0.44587389174334924,0.3458483018967734,0.18247975089746293,0.57061876624351404,0.39306312575270763,0.26992655831522938,0.51017043555290165,0.2697786068841897,0.32600448336769794,0.35889798654253247,0.53220349536764666,0.34920686696310987,0.28499210306124628,0.42532875374587242,0.39047256634666661,0.36111257858434553,0.36139716400263167]},"text":["Season 1977<br>Annual multiplier 0.74<br>95% interval 0.48–1.16","Season 1978<br>Annual multiplier 1.07<br>95% interval 0.71–1.61","Season 1979<br>Annual multiplier 1.25<br>95% interval 0.83–1.88","Season 1980<br>Annual multiplier 0.96<br>95% interval 0.63–1.45","Season 1981<br>Annual multiplier 1.18<br>95% interval 0.74–1.88","Season 1982<br>Annual multiplier 0.79<br>95% interval 0.49–1.26","Season 1983<br>Annual multiplier 0.83<br>95% interval 0.48–1.45","Season 1984<br>Annual multiplier 0.63<br>95% interval 0.39–1.01","Season 1985<br>Annual multiplier 1.34<br>95% interval 0.84–2.13","Season 1986<br>Annual multiplier 1.23<br>95% interval 0.80–1.87","Season 1987<br>Annual multiplier 0.64<br>95% interval 0.38–1.08","Season 1988<br>Annual multiplier 1.42<br>95% interval 0.87–2.30","Season 1989<br>Annual multiplier 0.76<br>95% interval 0.49–1.16","Season 1990<br>Annual multiplier 2.24<br>95% interval 1.48–3.37","Season 1991<br>Annual multiplier 1.00<br>95% interval 0.66–1.51","Season 1992<br>Annual multiplier 1.19<br>95% interval 0.73–1.94","Season 1993<br>Annual multiplier 1.34<br>95% interval 0.90–1.99","Season 1994<br>Annual multiplier 0.53<br>95% interval 0.33–0.85","Season 1995<br>Annual multiplier 0.86<br>95% interval 0.57–1.30","Season 1996<br>Annual multiplier 1.12<br>95% interval 0.74–1.68","Season 1997<br>Annual multiplier 0.78<br>95% interval 0.51–1.19","Season 1998<br>Annual multiplier 1.03<br>95% interval 0.69–1.55","Season 1999<br>Annual multiplier 1.30<br>95% interval 0.87–1.93","Season 2000<br>Annual multiplier 1.11<br>95% interval 0.74–1.66","Season 2001<br>Annual multiplier 0.90<br>95% interval 0.60–1.34","Season 2002<br>Annual multiplier 0.88<br>95% interval 0.59–1.33","Season 2003<br>Annual multiplier 0.90<br>95% interval 0.62–1.32","Season 2004<br>Annual multiplier 1.65<br>95% interval 1.13–2.40","Season 2005<br>Annual multiplier 1.75<br>95% interval 1.16–2.63","Season 2006<br>Annual multiplier 0.76<br>95% interval 0.49–1.17","Season 2007<br>Annual multiplier 1.34<br>95% interval 0.89–2.01","Season 2008<br>Annual multiplier 0.95<br>95% interval 0.60–1.49","Season 2009<br>Annual multiplier 0.54<br>95% interval 0.36–0.81","Season 2010<br>Annual multiplier 1.59<br>95% interval 1.02–2.48","Season 2011<br>Annual multiplier 1.05<br>95% interval 0.65–1.68","Season 2012<br>Annual multiplier 0.82<br>95% interval 0.55–1.22","Season 2013<br>Annual multiplier 1.46<br>95% interval 0.95–2.25","Season 2014<br>Annual multiplier 0.70<br>95% interval 0.43–1.14","Season 2015<br>Annual multiplier 0.82<br>95% interval 0.49–1.36","Season 2016<br>Annual multiplier 0.93<br>95% interval 0.57–1.52","Season 2017<br>Annual multiplier 1.47<br>95% interval 0.93–2.30","Season 2018<br>Annual multiplier 0.92<br>95% interval 0.58–1.49","Season 2019<br>Annual multiplier 0.74<br>95% interval 0.46–1.20","Season 2020<br>Annual multiplier 1.09<br>95% interval 0.66–1.79","Season 2021<br>Annual multiplier 0.93<br>95% interval 0.54–1.60","Season 2022<br>Annual multiplier 0.91<br>95% interval 0.55–1.51","Season 2023<br>Annual multiplier 0.89<br>95% interval 0.53–1.50"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"type":"scatter","error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+      </div>
+      <p class="caption">Annual deviations relative to M3a's smooth trend. Pointwise intervals exclude variance-component uncertainty.</p>
+      <details>
+        <summary>Weather coefficients in M2 and M3a</summary>
+        <p>Linear coefficients are conditional log catch associations per unit. M3a's annual intercept does not make every weather effect exclusively within-year.</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Weather input</th>
+                <th>Log multiplier</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>M2</td>
+                <td>total_cloud_cover_mean</td>
+                <td>0.71</td>
+              </tr>
+              <tr>
+                <td>M2</td>
+                <td>relative_humidity_mean_pct</td>
+                <td>0.07</td>
+              </tr>
+              <tr>
+                <td>M2</td>
+                <td>wind_u_10m_mean_ms</td>
+                <td>-0.60</td>
+              </tr>
+              <tr>
+                <td>M2</td>
+                <td>wind_v_10m_mean_ms</td>
+                <td>-0.02</td>
+              </tr>
+              <tr>
+                <td>M3a</td>
+                <td>total_cloud_cover_mean</td>
+                <td>0.62</td>
+              </tr>
+              <tr>
+                <td>M3a</td>
+                <td>relative_humidity_mean_pct</td>
+                <td>0.11</td>
+              </tr>
+              <tr>
+                <td>M3a</td>
+                <td>wind_u_10m_mean_ms</td>
+                <td>-0.60</td>
+              </tr>
+              <tr>
+                <td>M3a</td>
+                <td>wind_v_10m_mean_ms</td>
+                <td>-0.02</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+      <h3>M3a annual totals · unseen versus known years</h3>
+      <div class="chart">
+        <div id="htmlwidget-27fd6ff1546db4d92179" style="width:100%;height:400px;" class="plotly html-widget"></div>
+        <script type="application/json" data-for="htmlwidget-27fd6ff1546db4d92179">{"x":{"visdat":{"132ddeacb8cd":["function () ","plotlyVisDat"],"132dd6d98a241":["function () ","data"]},"cur_data":"132dd6d98a241","attrs":{"132ddeacb8cd":{"x":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"y":{},"type":"scatter","mode":"lines","name":"Observed total","line":{"color":"#172d32","width":2},"text":{},"hoverinfo":"text","inherit":true},"132ddeacb8cd.1":{"x":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"y":{},"type":"scatter","mode":"lines","name":"M3a estimated total","line":{"color":"#a04d86","width":2},"text":{},"hoverinfo":"text","inherit":true},"132dd6d98a241":{"x":{},"y":{},"type":"scatter","mode":"lines","name":"M3a with other dates known","line":{"color":"#bd88a8","dash":"dot"},"inherit":false}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Season"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Total birds on included recorded dates"},"legend":{"orientation":"h"},"hovermode":"closest","showlegend":true,"height":400},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":[1977,1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],"y":[4256,8210,13186,7218,5443,4033,2767,3484,6249,6160,2436,8382,7586,16937,9632,4748,14352,5281,13708,17429,17157,20074,20183,23289,14987,13612,18605,25316,28786,8222,15119,18651,9233,15408,10388,13827,19503,6660,7122,12351,15255,10688,6641,8911,5542,7131,6948],"type":"scatter","mode":"lines","name":"Observed total","line":{"color":"#172d32","width":2},"text":["Season 1977<br>Observed  4,256<br>32 dates","Season 1978<br>Observed  8,210<br>37 dates","Season 1979<br>Observed 13,186<br>31 dates","Season 1980<br>Observed  7,218<br>29 dates","Season 1981<br>Observed  5,443<br>15 dates","Season 1982<br>Observed  4,033<br>18 dates","Season 1983<br>Observed  2,767<br>9 dates","Season 1984<br>Observed  3,484<br>18 dates","Season 1985<br>Observed  6,249<br>15 dates","Season 1986<br>Observed  6,160<br>23 dates","Season 1987<br>Observed  2,436<br>14 dates","Season 1988<br>Observed  8,382<br>11 dates","Season 1989<br>Observed  7,586<br>29 dates","Season 1990<br>Observed 16,937<br>21 dates","Season 1991<br>Observed  9,632<br>28 dates","Season 1992<br>Observed  4,748<br>15 dates","Season 1993<br>Observed 14,352<br>38 dates","Season 1994<br>Observed  5,281<br>22 dates","Season 1995<br>Observed 13,708<br>33 dates","Season 1996<br>Observed 17,429<br>32 dates","Season 1997<br>Observed 17,157<br>30 dates","Season 1998<br>Observed 20,074<br>30 dates","Season 1999<br>Observed 20,183<br>30 dates","Season 2000<br>Observed 23,289<br>26 dates","Season 2001<br>Observed 14,987<br>29 dates","Season 2002<br>Observed 13,612<br>26 dates","Season 2003<br>Observed 18,605<br>33 dates","Season 2004<br>Observed 25,316<br>31 dates","Season 2005<br>Observed 28,786<br>21 dates","Season 2006<br>Observed  8,222<br>23 dates","Season 2007<br>Observed 15,119<br>23 dates","Season 2008<br>Observed 18,651<br>17 dates","Season 2009<br>Observed  9,233<br>28 dates","Season 2010<br>Observed 15,408<br>15 dates","Season 2011<br>Observed 10,388<br>15 dates","Season 2012<br>Observed 13,827<br>27 dates","Season 2013<br>Observed 19,503<br>17 dates","Season 2014<br>Observed  6,660<br>16 dates","Season 2015<br>Observed  7,122<br>13 dates","Season 2016<br>Observed 12,351<br>14 dates","Season 2017<br>Observed 15,255<br>15 dates","Season 2018<br>Observed 10,688<br>16 dates","Season 2019<br>Observed  6,641<br>17 dates","Season 2020<br>Observed  8,911<br>14 dates","Season 2021<br>Observed  5,542<br>10 dates","Season 2022<br>Observed  7,131<br>14 dates","Season 2023<br>Observed  6,948<br>13 dates"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1977,1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],"y":[8607.3507492431654,10321.730853566401,11273.015618281623,8577.1242097854192,5633.1526443487683,5837.7335451438203,3669.6406280036758,7224.4591886391017,4750.5248325895136,10033.479911740567,5753.7193106704235,4466.3507260658407,8768.9905339230536,5098.2586793005767,12520.222367183531,3841.0129866776124,8970.6918452178779,10790.171446681521,17814.880017339856,14349.095526214795,26267.808904422123,18531.185003058639,15724.759718845105,22790.550009033912,20231.043704691376,18970.552151792301,20472.780463355284,18278.731726217702,13859.232733838928,11948.014178199326,10131.56599928337,21628.800457369289,17673.885944842943,9703.8490710960996,9831.3723567808574,19815.571523299965,12244.567260786998,12220.008472524749,13069.243772763068,12832.671926962686,9260.0917139013254,14850.246845098967,12182.778952836992,7702.3827880374374,7874.7646663569649,8487.8359142704066,10120.052981588035],"type":"scatter","mode":"lines","name":"M3a estimated total","line":{"color":"#a04d86","width":2},"text":["Season 1977<br>Predicted  8,607<br>32 dates","Season 1978<br>Predicted 10,322<br>37 dates","Season 1979<br>Predicted 11,273<br>31 dates","Season 1980<br>Predicted  8,577<br>29 dates","Season 1981<br>Predicted  5,633<br>15 dates","Season 1982<br>Predicted  5,838<br>18 dates","Season 1983<br>Predicted  3,670<br>9 dates","Season 1984<br>Predicted  7,224<br>18 dates","Season 1985<br>Predicted  4,751<br>15 dates","Season 1986<br>Predicted 10,033<br>23 dates","Season 1987<br>Predicted  5,754<br>14 dates","Season 1988<br>Predicted  4,466<br>11 dates","Season 1989<br>Predicted  8,769<br>29 dates","Season 1990<br>Predicted  5,098<br>21 dates","Season 1991<br>Predicted 12,520<br>28 dates","Season 1992<br>Predicted  3,841<br>15 dates","Season 1993<br>Predicted  8,971<br>38 dates","Season 1994<br>Predicted 10,790<br>22 dates","Season 1995<br>Predicted 17,815<br>33 dates","Season 1996<br>Predicted 14,349<br>32 dates","Season 1997<br>Predicted 26,268<br>30 dates","Season 1998<br>Predicted 18,531<br>30 dates","Season 1999<br>Predicted 15,725<br>30 dates","Season 2000<br>Predicted 22,791<br>26 dates","Season 2001<br>Predicted 20,231<br>29 dates","Season 2002<br>Predicted 18,971<br>26 dates","Season 2003<br>Predicted 20,473<br>33 dates","Season 2004<br>Predicted 18,279<br>31 dates","Season 2005<br>Predicted 13,859<br>21 dates","Season 2006<br>Predicted 11,948<br>23 dates","Season 2007<br>Predicted 10,132<br>23 dates","Season 2008<br>Predicted 21,629<br>17 dates","Season 2009<br>Predicted 17,674<br>28 dates","Season 2010<br>Predicted  9,704<br>15 dates","Season 2011<br>Predicted  9,831<br>15 dates","Season 2012<br>Predicted 19,816<br>27 dates","Season 2013<br>Predicted 12,245<br>17 dates","Season 2014<br>Predicted 12,220<br>16 dates","Season 2015<br>Predicted 13,069<br>13 dates","Season 2016<br>Predicted 12,833<br>14 dates","Season 2017<br>Predicted  9,260<br>15 dates","Season 2018<br>Predicted 14,850<br>16 dates","Season 2019<br>Predicted 12,183<br>17 dates","Season 2020<br>Predicted  7,702<br>14 dates","Season 2021<br>Predicted  7,875<br>10 dates","Season 2022<br>Predicted  8,488<br>14 dates","Season 2023<br>Predicted 10,120<br>13 dates"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1977,1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],"y":[5874.4347449399866,10372.162841132604,12232.149959287886,7316.7571311571592,6371.1848471190415,4745.6863008592418,3053.5952646042279,4415.7752473316687,6174.9016084018913,13302.025525881567,3137.8046875876703,6363.675587439745,7779.1966798337007,12311.393070925684,9772.2677264397844,4534.4750823091808,12512.933100304514,3618.3225797543973,12735.104494397059,15788.177371821072,18153.390851165339,16896.546907407119,19920.72661691847,22521.605396530118,17132.103486048749,16397.630268098594,15415.137349635334,32021.185690727521,22477.704895733168,8713.3668989436555,13837.058210133318,19069.534866468955,8434.3668223024233,15726.27667541062,8853.2811537647867,14039.295722374205,16869.713545258521,7890.5616509953943,10678.408362295295,11612.933909539601,12253.722848137997,12515.462495851723,8622.5875740261763,9391.9816667206906,6085.4046645462904,6524.8372362695391,7510.7167806261077],"type":"scatter","mode":"lines","name":"M3a with other dates known","line":{"color":"#bd88a8","dash":"dot"},"marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+      </div>
+      <p class="caption">Solid model line: whole seasons held out, so the annual intercept is unknown. Dotted line: chronological date blocks held out while other dates from the same year estimate its intercept. Both are evaluated on the same included dates; the known-year test is retrospective.</p>
+      <h2 id="m3b">M3b · Shared weather response and recent annual baseline</h2>
+      <div class="equation"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>η</mi><mtext>3b</mtext></msub><mo>=</mo><msub><mi>η</mi><mn>2</mn></msub><mo>−</mo><mi>g</mi><mo>(</mo><mtext>year</mtext><mo>)</mo><mo>+</mo><msub><mi>a</mi><mtext>current year</mtext></msub></math></div>
+      <ul>
+        <li>Fit M2 to historical dates so its calendar, moon and weather terms use the long record. The historical smooth year term helps prevent annual level changes from being assigned to weather.</li>
+        <li>For each historical season, remove the fitted year-smooth term and compare observed totals with the resulting weather/calendar expectations. This estimates an adjusted annual catch level.</li>
+        <li>Use the most recent 10 annual levels, giving their weights a five-year half-life. This defines a constant pre-season level for future years rather than extending the spline's slope. The weights apply only to the annual baseline, not to the weather fit.</li>
+        <li>Treat remaining annual variation as a Gaussian distribution on log level. New observed counts update that distribution through the negative-binomial likelihood; the weather response remains fixed.</li>
+      </ul>
+      <p>The year smooth is therefore still used when estimating weather effects from historical data. It is not a future population-trend forecast in M3b. A stable recent annual baseline is an explicit assumption, and the smooth alone cannot prove that weather associations come only from within-year variation.</p>
+      <div class="chart">
+        <div id="htmlwidget-a21c4ac1a6d044e06e31" style="width:100%;height:370px;" class="plotly html-widget"></div>
+        <script type="application/json" data-for="htmlwidget-a21c4ac1a6d044e06e31">{"x":{"visdat":{"132dd79330f11":["function () ","plotlyVisDat"],"132dd7226341":["function () ","data"]},"cur_data":"132dd7226341","attrs":{"132dd79330f11":{"x":{},"y":{},"mode":"lines+markers","line":{"color":"#536ca9"},"marker":{"size":[11.177977468155035,10.507691201637003,9.9241731147500758,9.4161911155171847,8.9739670999406993,8.5889887340775175,8.2538456008185008,7.9620865573750379,7.7080955577585923,7.4869835499703496]},"text":{},"hoverinfo":"text","name":"Weather-adjusted annual level","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"},"132dd7226341":{"x":{},"y":{},"type":"scatter","mode":"lines","name":"Recent weighted baseline","line":{"color":"#172d32","dash":"dash"},"inherit":false}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Season"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Multiplier relative to shared weather/calendar response"},"legend":{"orientation":"h"},"hovermode":"closest","showlegend":true,"height":370},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":[2023,2022,2021,2020,2019,2018,2017,2016,2015,2014],"y":[0.55428302021099862,0.65335457759279703,0.59413655275244803,0.83954748493727227,0.46563242053076898,0.63506878478252671,1.4045270386556974,0.8331986994766758,0.57144655086829443,0.58088688928978893],"mode":"lines+markers","line":{"color":"#536ca9"},"marker":{"color":"rgba(31,119,180,1)","size":[11.177977468155035,10.507691201637003,9.9241731147500758,9.4161911155171847,8.9739670999406993,8.5889887340775175,8.2538456008185008,7.9620865573750379,7.7080955577585923,7.4869835499703496],"line":{"color":"rgba(31,119,180,1)"}},"text":["Season 2023<br>Adjusted level 0.55<br>Weight 17.3%<br>13 dates","Season 2022<br>Adjusted level 0.65<br>Weight 15.0%<br>14 dates","Season 2021<br>Adjusted level 0.59<br>Weight 13.1%<br>10 dates","Season 2020<br>Adjusted level 0.84<br>Weight 11.4%<br>14 dates","Season 2019<br>Adjusted level 0.47<br>Weight 9.9%<br>17 dates","Season 2018<br>Adjusted level 0.64<br>Weight 8.6%<br>16 dates","Season 2017<br>Adjusted level 1.40<br>Weight 7.5%<br>15 dates","Season 2016<br>Adjusted level 0.83<br>Weight 6.5%<br>14 dates","Season 2015<br>Adjusted level 0.57<br>Weight 5.7%<br>13 dates","Season 2014<br>Adjusted level 0.58<br>Weight 5.0%<br>16 dates"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text"],"name":"Weather-adjusted annual level","type":"scatter","error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],"y":[0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199,0.68946486879865199],"type":"scatter","mode":"lines","name":"Recent weighted baseline","line":{"color":"#172d32","dash":"dash"},"marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+      </div>
+      <p class="caption">Marker size shows recency weight. The dashed baseline is the weighted expected annual multiplier 0.69 from 2014–2023; the uncertainty SD on log scale is 0.29. This does not assert that future effort or population size will be constant.</p>
+      <h3>M3b annual totals · one-year-ahead forecast</h3>
+      <div class="chart">
+        <div id="htmlwidget-bb01e3e3db0a49c27250" style="width:100%;height:400px;" class="plotly html-widget"></div>
+        <script type="application/json" data-for="htmlwidget-bb01e3e3db0a49c27250">{"x":{"visdat":{"132dd3fc4919d":["function () ","plotlyVisDat"]},"cur_data":"132dd3fc4919d","attrs":{"132dd3fc4919d":{"x":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"y":{},"type":"scatter","mode":"lines","name":"Observed total","line":{"color":"#172d32","width":2},"text":{},"hoverinfo":"text","inherit":true},"132dd3fc4919d.1":{"x":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"y":{},"type":"scatter","mode":"lines","name":"M3b estimated total","line":{"color":"#536ca9","width":2},"text":{},"hoverinfo":"text","inherit":true}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Season"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Total birds on included recorded dates"},"legend":{"orientation":"h"},"hovermode":"closest","showlegend":true,"height":400},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":[1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],"y":[17157,20074,20183,23289,14987,13612,18605,25316,28786,8222,15119,18651,9233,15408,10388,13827,19503,6660,7122,12351,15255,10688,6641,8911,5542,7131,6948],"type":"scatter","mode":"lines","name":"Observed total","line":{"color":"#172d32","width":2},"text":["Season 1997<br>Observed 17,157<br>30 dates","Season 1998<br>Observed 20,074<br>30 dates","Season 1999<br>Observed 20,183<br>30 dates","Season 2000<br>Observed 23,289<br>26 dates","Season 2001<br>Observed 14,987<br>29 dates","Season 2002<br>Observed 13,612<br>26 dates","Season 2003<br>Observed 18,605<br>33 dates","Season 2004<br>Observed 25,316<br>31 dates","Season 2005<br>Observed 28,786<br>21 dates","Season 2006<br>Observed  8,222<br>23 dates","Season 2007<br>Observed 15,119<br>23 dates","Season 2008<br>Observed 18,651<br>17 dates","Season 2009<br>Observed  9,233<br>28 dates","Season 2010<br>Observed 15,408<br>15 dates","Season 2011<br>Observed 10,388<br>15 dates","Season 2012<br>Observed 13,827<br>27 dates","Season 2013<br>Observed 19,503<br>17 dates","Season 2014<br>Observed  6,660<br>16 dates","Season 2015<br>Observed  7,122<br>13 dates","Season 2016<br>Observed 12,351<br>14 dates","Season 2017<br>Observed 15,255<br>15 dates","Season 2018<br>Observed 10,688<br>16 dates","Season 2019<br>Observed  6,641<br>17 dates","Season 2020<br>Observed  8,911<br>14 dates","Season 2021<br>Observed  5,542<br>10 dates","Season 2022<br>Observed  7,131<br>14 dates","Season 2023<br>Observed  6,948<br>13 dates"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],"y":[18673.227348889995,18485.782146522095,14768.417849615626,22008.317385020298,21679.410216383545,17631.467658336536,18850.792439809782,18752.701855185194,15768.284779668265,14923.210930846946,12192.965672368488,28449.445289420888,20922.146494969918,11450.580869124926,9261.0691126747879,21594.185839739359,15711.708916490232,12819.434078532237,12578.192389722893,14712.485453598043,9168.2642508588524,16752.559656969446,12795.141859568239,8723.2494131502826,7997.4995015692602,8496.7275011993806,9446.3869054624829],"type":"scatter","mode":"lines","name":"M3b estimated total","line":{"color":"#536ca9","width":2},"text":["Season 1997<br>Predicted 18,673<br>30 dates","Season 1998<br>Predicted 18,486<br>30 dates","Season 1999<br>Predicted 14,768<br>30 dates","Season 2000<br>Predicted 22,008<br>26 dates","Season 2001<br>Predicted 21,679<br>29 dates","Season 2002<br>Predicted 17,631<br>26 dates","Season 2003<br>Predicted 18,851<br>33 dates","Season 2004<br>Predicted 18,753<br>31 dates","Season 2005<br>Predicted 15,768<br>21 dates","Season 2006<br>Predicted 14,923<br>23 dates","Season 2007<br>Predicted 12,193<br>23 dates","Season 2008<br>Predicted 28,449<br>17 dates","Season 2009<br>Predicted 20,922<br>28 dates","Season 2010<br>Predicted 11,451<br>15 dates","Season 2011<br>Predicted  9,261<br>15 dates","Season 2012<br>Predicted 21,594<br>27 dates","Season 2013<br>Predicted 15,712<br>17 dates","Season 2014<br>Predicted 12,819<br>16 dates","Season 2015<br>Predicted 12,578<br>13 dates","Season 2016<br>Predicted 14,712<br>14 dates","Season 2017<br>Predicted  9,168<br>15 dates","Season 2018<br>Predicted 16,753<br>16 dates","Season 2019<br>Predicted 12,795<br>17 dates","Season 2020<br>Predicted  8,723<br>14 dates","Season 2021<br>Predicted  7,997<br>10 dates","Season 2022<br>Predicted  8,497<br>14 dates","Season 2023<br>Predicted  9,446<br>13 dates"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+      </div>
+      <p class="caption">Each season 1997–2023 is forecast using only earlier seasons. Annual totals sum predictions over the same observed operated dates, using retrospective ERA5 weather.</p>
+      <h2 id="validation">Validation · Different questions need different splits</h2>
+      <p>Whole-season folds test transfer to seasons unseen by training. Within-year blocks test prediction when some dates from that year are already known. Rolling origins train only through the previous season and test one, two or three years ahead; they are the relevant check for 2025+ use.</p>
+      <h3>Whole-season folds · M0 through M3a</h3>
+      <div class="chart-grid">
+        <div class="chart">
+          <div id="htmlwidget-39d4017c780ef6e063a1" style="width:100%;height:320px;" class="plotly html-widget"></div>
+          <script type="application/json" data-for="htmlwidget-39d4017c780ef6e063a1">{"x":{"visdat":{"132dd62a2440f":["function () ","plotlyVisDat"]},"cur_data":"132dd62a2440f","attrs":{"132dd62a2440f":{"x":{},"y":[516.96769911017282,451.1548438622379,430.31943039445264,442.18224393291399],"text":["516.97","451.15","430.32","442.18"],"textposition":"auto","marker":{"color":["#54728a","#167b75","#b87628","#a04d86"]},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Model","type":"category","categoryorder":"array","categoryarray":["M0","M1","M2","M3a"]},"yaxis":{"domain":[0,1],"automargin":true,"title":"Poisson deviance ↓"},"showlegend":false,"hovermode":"closest","height":320},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":["M0","M1","M2","M3a"],"y":[516.96769911017282,451.1548438622379,430.31943039445264,442.18224393291399],"text":["516.97","451.15","430.32","442.18"],"textposition":["auto","auto","auto","auto"],"marker":{"color":["#54728a","#167b75","#b87628","#a04d86"],"line":{"color":"rgba(31,119,180,1)"}},"type":"bar","error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+        </div>
+        <div class="chart">
+          <div id="htmlwidget-f42651f46a022a5b853f" style="width:100%;height:320px;" class="plotly html-widget"></div>
+          <script type="application/json" data-for="htmlwidget-f42651f46a022a5b853f">{"x":{"visdat":{"132dd7fb0d555":["function () ","plotlyVisDat"]},"cur_data":"132dd7fb0d555","attrs":{"132dd7fb0d555":{"x":{},"y":[0.30940167690417392,0.46703298435623442,0.47616196665477151,0.48843082809471983],"text":["0.31","0.47","0.48","0.49"],"textposition":"auto","marker":{"color":["#54728a","#167b75","#b87628","#a04d86"]},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Model","type":"category","categoryorder":"array","categoryarray":["M0","M1","M2","M3a"]},"yaxis":{"domain":[0,1],"automargin":true,"title":"Season rank correlation ↑"},"showlegend":false,"hovermode":"closest","height":320},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":["M0","M1","M2","M3a"],"y":[0.30940167690417392,0.46703298435623442,0.47616196665477151,0.48843082809471983],"text":["0.31","0.47","0.48","0.49"],"textposition":["auto","auto","auto","auto"],"marker":{"color":["#54728a","#167b75","#b87628","#a04d86"],"line":{"color":"rgba(31,119,180,1)"}},"type":"bar","error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Deviance ↓</th>
+              <th>Annual mean log error ↓</th>
+              <th>Centered daily log error ↓</th>
+              <th>Predictive log loss ↓</th>
+              <th>80% coverage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>M0</td>
+              <td>516.97</td>
+              <td>0.53</td>
+              <td>1.56</td>
+              <td>7.05</td>
+              <td>77.4%</td>
+            </tr>
+            <tr>
+              <td>M1</td>
+              <td>451.15</td>
+              <td>0.48</td>
+              <td>1.42</td>
+              <td>6.99</td>
+              <td>79.2%</td>
+            </tr>
+            <tr>
+              <td>M2</td>
+              <td>430.32</td>
+              <td>0.42</td>
+              <td>1.42</td>
+              <td>6.99</td>
+              <td>77.1%</td>
+            </tr>
+            <tr>
+              <td>M3a</td>
+              <td>442.18</td>
+              <td>0.45</td>
+              <td>1.41</td>
+              <td>6.99</td>
+              <td>76.9%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Compared with M2</th>
+              <th>Deviance difference</th>
+              <th>95% lower</th>
+              <th>95% upper</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>M3a</td>
+              <td>11.86</td>
+              <td>-0.00</td>
+              <td>26.31</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="caption">Paired season-bootstrap intervals condition on the already explored models. Negative differences favor the candidate.</p>
+      <h3>Known-year date blocks · M2 and M3a</h3>
+      <div class="chart-grid">
+        <div class="chart">
+          <div id="htmlwidget-d5a8fa2ae9548af1e521" style="width:100%;height:320px;" class="plotly html-widget"></div>
+          <script type="application/json" data-for="htmlwidget-d5a8fa2ae9548af1e521">{"x":{"visdat":{"132dd233fb20":["function () ","plotlyVisDat"]},"cur_data":"132dd233fb20","attrs":{"132dd233fb20":{"x":{},"y":[0.37293176569642544,0.20445791380522096],"text":["0.37","0.20"],"textposition":"auto","marker":{"color":["#b87628","#a04d86"]},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Model","type":"category","categoryorder":"array","categoryarray":["M2","M3a"]},"yaxis":{"domain":[0,1],"automargin":true,"title":"Annual mean log error ↓"},"showlegend":false,"hovermode":"closest","height":320},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":["M2","M3a"],"y":[0.37293176569642544,0.20445791380522096],"text":["0.37","0.20"],"textposition":["auto","auto"],"marker":{"color":["#b87628","#a04d86"],"line":{"color":"rgba(31,119,180,1)"}},"type":"bar","error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+        </div>
+        <div class="chart">
+          <div id="htmlwidget-b2634c2155b724ca7662" style="width:100%;height:320px;" class="plotly html-widget"></div>
+          <script type="application/json" data-for="htmlwidget-b2634c2155b724ca7662">{"x":{"visdat":{"132dd22abf301":["function () ","plotlyVisDat"]},"cur_data":"132dd22abf301","attrs":{"132dd22abf301":{"x":{},"y":[1.4441377660785677,1.472145575254729],"text":["1.44","1.47"],"textposition":"auto","marker":{"color":["#b87628","#a04d86"]},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Model","type":"category","categoryorder":"array","categoryarray":["M2","M3a"]},"yaxis":{"domain":[0,1],"automargin":true,"title":"Centered daily log error ↓"},"showlegend":false,"hovermode":"closest","height":320},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":["M2","M3a"],"y":[1.4441377660785677,1.472145575254729],"text":["1.44","1.47"],"textposition":["auto","auto"],"marker":{"color":["#b87628","#a04d86"],"line":{"color":"rgba(31,119,180,1)"}},"type":"bar","error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Deviance ↓</th>
+              <th>Within-season rank ↑</th>
+              <th>Annual mean log error ↓</th>
+              <th>Centered daily log error ↓</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>M2</td>
+              <td>429.51</td>
+              <td>0.46</td>
+              <td>0.37</td>
+              <td>1.44</td>
+            </tr>
+            <tr>
+              <td>M3a</td>
+              <td>420.81</td>
+              <td>0.42</td>
+              <td>0.20</td>
+              <td>1.47</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>M3a improves the known-year level but slightly worsens centered daily error and rank. The date-block fit can use later dates from that season, so it does not simulate live updates.</p>
+      <h3>Rolling forecasts · M2 versus M3b</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Years ahead</th>
+              <th>Test period</th>
+              <th>Dates</th>
+              <th>Deviance ↓</th>
+              <th>Annual mean log error ↓</th>
+              <th>Predicted mean</th>
+              <th>Observed mean</th>
+              <th>Predictive log loss ↓</th>
+              <th>80% coverage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>M2</td>
+              <td>1</td>
+              <td>1997–2013</td>
+              <td>421</td>
+              <td>562.44</td>
+              <td>0.38</td>
+              <td>708.31</td>
+              <td>694.44</td>
+              <td>7.35</td>
+              <td>78.4%</td>
+            </tr>
+            <tr>
+              <td>M2</td>
+              <td>1</td>
+              <td>2014–2023</td>
+              <td>142</td>
+              <td>522.72</td>
+              <td>0.46</td>
+              <td>810.28</td>
+              <td>614.43</td>
+              <td>7.35</td>
+              <td>85.2%</td>
+            </tr>
+            <tr>
+              <td>M2</td>
+              <td>2</td>
+              <td>1997–2013</td>
+              <td>391</td>
+              <td>571.32</td>
+              <td>0.39</td>
+              <td>715.22</td>
+              <td>703.84</td>
+              <td>7.37</td>
+              <td>79.8%</td>
+            </tr>
+            <tr>
+              <td>M2</td>
+              <td>2</td>
+              <td>2014–2023</td>
+              <td>142</td>
+              <td>509.70</td>
+              <td>0.45</td>
+              <td>832.69</td>
+              <td>614.43</td>
+              <td>7.34</td>
+              <td>87.3%</td>
+            </tr>
+            <tr>
+              <td>M2</td>
+              <td>3</td>
+              <td>1997–2013</td>
+              <td>361</td>
+              <td>587.25</td>
+              <td>0.39</td>
+              <td>728.41</td>
+              <td>706.73</td>
+              <td>7.38</td>
+              <td>78.4%</td>
+            </tr>
+            <tr>
+              <td>M2</td>
+              <td>3</td>
+              <td>2014–2023</td>
+              <td>142</td>
+              <td>518.94</td>
+              <td>0.46</td>
+              <td>865.89</td>
+              <td>614.43</td>
+              <td>7.34</td>
+              <td>86.6%</td>
+            </tr>
+            <tr>
+              <td>M3b</td>
+              <td>1</td>
+              <td>1997–2013</td>
+              <td>421</td>
+              <td>560.07</td>
+              <td>0.37</td>
+              <td>715.26</td>
+              <td>694.44</td>
+              <td>7.35</td>
+              <td>79.3%</td>
+            </tr>
+            <tr>
+              <td>M3b</td>
+              <td>1</td>
+              <td>2014–2023</td>
+              <td>142</td>
+              <td>504.01</td>
+              <td>0.44</td>
+              <td>799.22</td>
+              <td>614.43</td>
+              <td>7.35</td>
+              <td>88.0%</td>
+            </tr>
+            <tr>
+              <td>M3b</td>
+              <td>2</td>
+              <td>1997–2013</td>
+              <td>391</td>
+              <td>566.23</td>
+              <td>0.39</td>
+              <td>719.82</td>
+              <td>703.84</td>
+              <td>7.37</td>
+              <td>80.3%</td>
+            </tr>
+            <tr>
+              <td>M3b</td>
+              <td>2</td>
+              <td>2014–2023</td>
+              <td>142</td>
+              <td>518.37</td>
+              <td>0.46</td>
+              <td>828.21</td>
+              <td>614.43</td>
+              <td>7.35</td>
+              <td>87.3%</td>
+            </tr>
+            <tr>
+              <td>M3b</td>
+              <td>3</td>
+              <td>1997–2013</td>
+              <td>361</td>
+              <td>580.01</td>
+              <td>0.38</td>
+              <td>728.24</td>
+              <td>706.73</td>
+              <td>7.38</td>
+              <td>79.8%</td>
+            </tr>
+            <tr>
+              <td>M3b</td>
+              <td>3</td>
+              <td>2014–2023</td>
+              <td>142</td>
+              <td>520.26</td>
+              <td>0.47</td>
+              <td>859.06</td>
+              <td>614.43</td>
+              <td>7.35</td>
+              <td>88.0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Years ahead</th>
+              <th>Test period</th>
+              <th>M3b − M2 deviance</th>
+              <th>95% lower</th>
+              <th>95% upper</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>1997–2013</td>
+              <td>-2.37</td>
+              <td>-7.74</td>
+              <td>2.75</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2014–2023</td>
+              <td>-18.71</td>
+              <td>-41.76</td>
+              <td>4.04</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>1997–2013</td>
+              <td>-5.09</td>
+              <td>-13.25</td>
+              <td>2.95</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>2014–2023</td>
+              <td>8.67</td>
+              <td>-21.31</td>
+              <td>38.51</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>1997–2013</td>
+              <td>-7.24</td>
+              <td>-19.12</td>
+              <td>3.98</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>2014–2023</td>
+              <td>1.32</td>
+              <td>-34.25</td>
+              <td>28.24</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="caption">Every paired 95% season-bootstrap interval spans zero. The M3b year-level rule was proposed after examining historical count results, so these estimates are exploratory. All tests use ERA5 weather rather than archived issued forecasts.</p>
+      <h2 id="live">Live annual updates · One new count at a time</h2>
+      <p>Before the season, M3b forecasts with its recent annual baseline. For each completed operated date, enter the comparable non-swallow count and matched weather. Its negative-binomial likelihood updates only the current annual level; no whole-model refit is needed. Predict the remaining dates with the posterior average annual multiplier. Missing dates are never entered as zero.</p>
+      <div class="chart">
+        <div id="htmlwidget-4f5340bc6bbdb0d34877" style="width:100%;height:390px;" class="plotly html-widget"></div>
+        <script type="application/json" data-for="htmlwidget-4f5340bc6bbdb0d34877">{"x":{"visdat":{"132dd7ba7e820":["function () ","plotlyVisDat"]},"cur_data":"132dd7ba7e820","attrs":{"132dd7ba7e820":{"x":{},"y":{},"mode":"lines+markers","text":{},"hoverinfo":"text","color":{},"colors":["#b87628","#8ea4d0","#536ca9"],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"l":75,"r":25,"b":75,"t":25},"xaxis":{"domain":[0,1],"automargin":true,"title":"Current-year dates already observed","tickvals":[0,1,2,3,4,5,6,7,8,9,10]},"yaxis":{"domain":[0,1],"automargin":true,"title":"Deviance on subsequent dates ↓"},"legend":{"orientation":"h"},"hovermode":"closest","showlegend":true,"height":390},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"responsive":true,"displaylogo":false},"data":[{"x":[0,1,2,3,4,5,6,7,8,9,10],"y":[552.42081440718221,549.42577211506011,555.12954069004081,541.06149605333599,540.25023203763487,525.13652249573602,516.1661002124082,517.5679253796402,512.95498475165334,512.54411986846105,512.46236557374834],"mode":"lines+markers","text":["M2<br>0 observed dates<br>563 test dates across 27 seasons<br>Deviance 552.4","M2<br>1 observed dates<br>536 test dates across 27 seasons<br>Deviance 549.4","M2<br>2 observed dates<br>509 test dates across 27 seasons<br>Deviance 555.1","M2<br>3 observed dates<br>482 test dates across 27 seasons<br>Deviance 541.1","M2<br>4 observed dates<br>455 test dates across 27 seasons<br>Deviance 540.3","M2<br>5 observed dates<br>428 test dates across 27 seasons<br>Deviance 525.1","M2<br>6 observed dates<br>401 test dates across 27 seasons<br>Deviance 516.2","M2<br>7 observed dates<br>374 test dates across 27 seasons<br>Deviance 517.6","M2<br>8 observed dates<br>347 test dates across 27 seasons<br>Deviance 513.0","M2<br>9 observed dates<br>320 test dates across 27 seasons<br>Deviance 512.5","M2<br>10 observed dates<br>293 test dates across 26 seasons<br>Deviance 512.5"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text"],"type":"scatter","name":"M2","marker":{"color":"rgba(184,118,40,1)","line":{"color":"rgba(184,118,40,1)"}},"textfont":{"color":"rgba(184,118,40,1)"},"error_y":{"color":"rgba(184,118,40,1)"},"error_x":{"color":"rgba(184,118,40,1)"},"line":{"color":"rgba(184,118,40,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0,1,2,3,4,5,6,7,8,9,10],"y":[545.92989116605702,542.60530533064264,547.97181470357089,534.49991932177659,533.44876241305008,518.28779924556466,509.37125497810081,510.35497621183282,505.7846791523491,506.00960378384366,507.6484890411943],"mode":"lines+markers","text":["M3b prior<br>0 observed dates<br>563 test dates across 27 seasons<br>Deviance 545.9","M3b prior<br>1 observed dates<br>536 test dates across 27 seasons<br>Deviance 542.6","M3b prior<br>2 observed dates<br>509 test dates across 27 seasons<br>Deviance 548.0","M3b prior<br>3 observed dates<br>482 test dates across 27 seasons<br>Deviance 534.5","M3b prior<br>4 observed dates<br>455 test dates across 27 seasons<br>Deviance 533.4","M3b prior<br>5 observed dates<br>428 test dates across 27 seasons<br>Deviance 518.3","M3b prior<br>6 observed dates<br>401 test dates across 27 seasons<br>Deviance 509.4","M3b prior<br>7 observed dates<br>374 test dates across 27 seasons<br>Deviance 510.4","M3b prior<br>8 observed dates<br>347 test dates across 27 seasons<br>Deviance 505.8","M3b prior<br>9 observed dates<br>320 test dates across 27 seasons<br>Deviance 506.0","M3b prior<br>10 observed dates<br>293 test dates across 26 seasons<br>Deviance 507.6"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text"],"type":"scatter","name":"M3b prior","marker":{"color":"rgba(142,164,208,1)","line":{"color":"rgba(142,164,208,1)"}},"textfont":{"color":"rgba(142,164,208,1)"},"error_y":{"color":"rgba(142,164,208,1)"},"error_x":{"color":"rgba(142,164,208,1)"},"line":{"color":"rgba(142,164,208,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0,1,2,3,4,5,6,7,8,9,10],"y":[545.92989116605702,545.04251269986707,552.80535924652577,537.09983804691853,533.01577509178401,523.60302117537992,509.88945643327366,495.59040459350979,486.75789555872575,491.73456955021027,488.23877374732615],"mode":"lines+markers","text":["M3b updated<br>0 observed dates<br>563 test dates across 27 seasons<br>Deviance 545.9","M3b updated<br>1 observed dates<br>536 test dates across 27 seasons<br>Deviance 545.0","M3b updated<br>2 observed dates<br>509 test dates across 27 seasons<br>Deviance 552.8","M3b updated<br>3 observed dates<br>482 test dates across 27 seasons<br>Deviance 537.1","M3b updated<br>4 observed dates<br>455 test dates across 27 seasons<br>Deviance 533.0","M3b updated<br>5 observed dates<br>428 test dates across 27 seasons<br>Deviance 523.6","M3b updated<br>6 observed dates<br>401 test dates across 27 seasons<br>Deviance 509.9","M3b updated<br>7 observed dates<br>374 test dates across 27 seasons<br>Deviance 495.6","M3b updated<br>8 observed dates<br>347 test dates across 27 seasons<br>Deviance 486.8","M3b updated<br>9 observed dates<br>320 test dates across 27 seasons<br>Deviance 491.7","M3b updated<br>10 observed dates<br>293 test dates across 26 seasons<br>Deviance 488.2"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text"],"type":"scatter","name":"M3b updated","marker":{"color":"rgba(83,108,169,1)","line":{"color":"rgba(83,108,169,1)"}},"textfont":{"color":"rgba(83,108,169,1)"},"error_y":{"color":"rgba(83,108,169,1)"},"error_x":{"color":"rgba(83,108,169,1)"},"line":{"color":"rgba(83,108,169,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Known dates</th>
+              <th>Remaining test dates</th>
+              <th>Seasons</th>
+              <th>Deviance ↓</th>
+              <th>Annual mean log error ↓</th>
+              <th>Predicted mean</th>
+              <th>Observed mean</th>
+              <th>80% coverage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>M2</td>
+              <td>0</td>
+              <td>563</td>
+              <td>27</td>
+              <td>552.42</td>
+              <td>0.41</td>
+              <td>734.03</td>
+              <td>674.26</td>
+              <td>80.1%</td>
+            </tr>
+            <tr>
+              <td>M2</td>
+              <td>5</td>
+              <td>428</td>
+              <td>27</td>
+              <td>525.14</td>
+              <td>0.51</td>
+              <td>748.15</td>
+              <td>727.45</td>
+              <td>82.0%</td>
+            </tr>
+            <tr>
+              <td>M2</td>
+              <td>10</td>
+              <td>293</td>
+              <td>26</td>
+              <td>512.46</td>
+              <td>0.58</td>
+              <td>674.89</td>
+              <td>665.07</td>
+              <td>81.9%</td>
+            </tr>
+            <tr>
+              <td>M3b prior</td>
+              <td>0</td>
+              <td>563</td>
+              <td>27</td>
+              <td>545.93</td>
+              <td>0.40</td>
+              <td>736.44</td>
+              <td>674.26</td>
+              <td>81.5%</td>
+            </tr>
+            <tr>
+              <td>M3b prior</td>
+              <td>5</td>
+              <td>428</td>
+              <td>27</td>
+              <td>518.29</td>
+              <td>0.51</td>
+              <td>751.43</td>
+              <td>727.45</td>
+              <td>83.4%</td>
+            </tr>
+            <tr>
+              <td>M3b prior</td>
+              <td>10</td>
+              <td>293</td>
+              <td>26</td>
+              <td>507.65</td>
+              <td>0.57</td>
+              <td>680.88</td>
+              <td>665.07</td>
+              <td>83.3%</td>
+            </tr>
+            <tr>
+              <td>M3b updated</td>
+              <td>0</td>
+              <td>563</td>
+              <td>27</td>
+              <td>545.93</td>
+              <td>0.40</td>
+              <td>736.44</td>
+              <td>674.26</td>
+              <td>81.5%</td>
+            </tr>
+            <tr>
+              <td>M3b updated</td>
+              <td>5</td>
+              <td>428</td>
+              <td>27</td>
+              <td>523.60</td>
+              <td>0.50</td>
+              <td>679.43</td>
+              <td>727.45</td>
+              <td>80.8%</td>
+            </tr>
+            <tr>
+              <td>M3b updated</td>
+              <td>10</td>
+              <td>293</td>
+              <td>26</td>
+              <td>488.24</td>
+              <td>0.51</td>
+              <td>631.45</td>
+              <td>665.07</td>
+              <td>82.3%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="caption">All three lines are evaluated on identical subsequent dates at each known-date count. Moving right changes the test cohort; compare lines vertically, not the slope of one line alone. The full day-by-day trajectory is saved in count_m3b_updated_scores.csv.</p>
+      <p>The M2 specification is published for count forecasts with front-bush layout. This comparison remains retrospective: it uses historically selected operated dates, incomplete historical zero coverage and reanalysis weather. The live forecast holds M2's year term at its 2023 value for later seasons; the held-year rule is now assessed in the separate model description and validation report. Issued-weather accuracy remains unmeasured.</p>
+      <p class="caption">Rebuild: run scripts under count/scripts/alternatives/: 08_compare_m0_m2.R, 10_verify_count_annual.R, 12_compare_m3b.R, 14_verify_count_m3b.R, 15_compare_count_weather.R, 17_verify_count_weather.R, and count/scripts/build_alternatives_report.R with Rscript. Keep lib/ beside this HTML file.</p>
+    </main>
+  </body>
+</html>
+</html>

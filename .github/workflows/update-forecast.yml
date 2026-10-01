@@ -5,11 +5,11 @@ on:
   push:
     branches: [main]
     paths:
-      - "data/**"
+      - "raw-data/**"
       - "scripts/**"
       - "site/**"
-      - "validation/research/**"
-      - "research/**"
+      - "count/**"
+      - "mist/**"
       - "DESCRIPTION"
       - ".github/workflows/update-forecast.yml"
   schedule:
@@ -55,13 +55,13 @@ jobs:
           .venv-forecast/bin/python -m pip install numpy
           .venv-forecast/bin/python -c "import numpy; print(numpy.__version__)"
 
-      - name: Train count M2
-        run: Rscript scripts/production/count/train.R
+      - name: Train count model
+        run: Rscript count/scripts/train.R
 
       - name: Fetch weather and predict count and mist
         env:
           NGULIA_PYTHON: ${{ github.workspace }}/.venv-forecast/bin/python
-        run: Rscript scripts/production/update_forecast.R
+        run: Rscript scripts/update_forecast.R
 
       - name: Archive issued forecast
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -76,7 +76,7 @@ jobs:
           git push
 
       - name: Include count and mist reports
-        run: python scripts/production/publish_reports.py
+        run: python scripts/publish_reports.py
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

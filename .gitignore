@@ -2,20 +2,30 @@
 .Rhistory
 .Rproj.user/
 .sites-runtime/
-site/reports/
-model/*.rds
-validation/research/*.rds
-
 .venv-mist/
 .venv-forecast/
 __pycache__/
-validation/research/mist/*.rds
-validation/research/mist/artifacts/*.npz
+site/reports/
+site/count/
+site/mist/
+count/model/*.rds
+mist/model/*.rds
+mist/model/research/
 
-# Regenerable research intermediates; keep reports and concise score tables.
-validation/research/count_*.csv
-validation/research/mist/*.csv
-validation/research/mist/*.json
-validation/research/mist/*.txt
-validation/research/mist/artifacts/
-validation/research/*.txt
+# Regenerable intermediates; preserve concise assessment tables.
+count/intermediate-data/*
+!count/intermediate-data/forecast_validation_scores.csv
+!count/intermediate-data/forecast_validation_seasons.csv
+!count/intermediate-data/count_annual_scores.csv
+!count/intermediate-data/count_annual_forward_scores.csv
+!count/intermediate-data/count_m3b_forward_scores.csv
+!count/intermediate-data/count_m3b_updated_scores.csv
+!count/intermediate-data/count_weather_scores.csv
+!count/intermediate-data/count_weather_paired.csv
+mist/intermediate-data/*
+!mist/intermediate-data/scores.csv
+!mist/intermediate-data/fold_scores.csv
+!mist/intermediate-data/paired_differences.csv
+!mist/intermediate-data/category_scores.csv
+
+raw-data/*.zip

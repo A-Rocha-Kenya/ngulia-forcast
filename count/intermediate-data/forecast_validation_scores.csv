@@ -1,0 +1,2 @@
+dates,seasons,mean_absolute_error,mean_poisson_deviance,observed_mean,predicted_mean,interval_80_coverage,mean_negative_binomial_log_loss
+142,10,485.4334792305096,523.3539744277863,614.4295774647886,819.0734005264771,0.8591549295774648,7.347285587728678

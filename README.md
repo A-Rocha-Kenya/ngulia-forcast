@@ -1,33 +1,66 @@
 # Ngulia daily forecast
 
-The website publishes **one count model and one mist model** from a shared Open-Meteo ECMWF hourly forecast. Count and mist are fitted independently; their probabilities and expected counts are displayed together, not multiplied.
+[Open the forecast website](https://a-rocha-kenya.github.io/ngulia-forcast/) · [View the demo](https://a-rocha-kenya.github.io/ngulia-forcast/?demo=1)
 
-| Output | Published model | Historical assessment | Main limitation |
-|---|---|---|---|
-| Expected daily catch, conditional on operation at front bush | M2 negative-binomial GAM: season day, moon, eight weather inputs, net layout and a smooth historical year term | Rolling 2014–2023 evaluation: mean Poisson deviance 522.7; mean absolute error 483 birds on 142 operated dates | Unmeasured annual effort/population variation; issued-weather error unmeasured |
-| Probability of any recorded mist | Three-member six-channel hourly CNN, previous 21:00 through 08:00 | Five whole-season folds through 2013: Brier 0.1675, log loss 0.5045, AUC 0.8103 on 1,184 dates | No field labels after 2013; issued-weather error unmeasured |
+The website predicts daily capture count and the probability of mist at Ngulia. Both models use the same issued Open-Meteo ECMWF hourly forecast, with separate inputs and predictions. The scheduled pipeline refreshes the website twice daily during the ringing season and archives issued forecasts for later assessment.
 
-The count model is fit through 2023. For future seasons the live forecast holds its fitted year term at 2023, avoiding an unchecked extrapolation of the historical smooth. This operational rule is explicit in the JSON model metadata; it has not been scored in the retrospective comparison. The mist ensemble is frozen through 2013. Neither model updates from current-year observations. A catch forecast assumes the front-bush layout and a ringing date; it does not predict whether ringing will occur.
+## Daily capture count
 
-## Run the live pipeline
+**[Read the count model report](https://a-rocha-kenya.github.io/ngulia-forcast/count/model.html)** for the description of the full forecast model, its interactive effect plots and next-season validation.
 
-From the repository root, with the R packages in `DESCRIPTION` and Python NumPy installed:
+The forecast estimates the number of birds captured **assuming ringing takes place at front bush**. A negative-binomial generalized additive model combines season timing, moon phase, morning rain, wind, temperature, pressure, cloud cover and humidity. Historical net layout and a smooth year effect account for changes in capture level across the training record.
+
+Training uses 1,033 operated dates in 47 seasons from 1977–2023, including documented zero-catch operation dates. For future seasons, the year effect stays at its fitted 2023 level. The forecast shows an expected count and an 80% count range; that range does not include uncertainty in the issued weather or the fitted coefficients. The full-season reference curve uses typical historical weather.
+
+Rolling evaluation on 142 operated dates in 2014–2023 gives a mean absolute error of **485 birds per date**. Adding previous-morning rain or an annual level that updates from current-season observations gave uncertain improvements, so the published model remains the simpler choice. The separate [alternatives report](https://a-rocha-kenya.github.io/ngulia-forcast/count/alternatives.html) documents these exploratory comparisons; [selection notes](count/selection_notes.md) summarize the other tests.
+
+The evaluation uses historical ERA5 weather. The rolling assessment holds the year effect at the last training year, matching the production rule. Accuracy with issued ECMWF weather still needs assessment using new observations. The model currently does not update from live capture counts.
+
+To train the count model and refresh both website predictions, run from the repository root with the R dependencies in `DESCRIPTION` and Python NumPy installed:
 
 ```sh
-Rscript scripts/production/count/train.R
-Rscript scripts/production/update_forecast.R
+Rscript count/scripts/train.R
+Rscript scripts/update_forecast.R
 ```
 
-The first script writes the ignored count fit `model/count_m2.rds`. The mist weights and metadata are committed in `model/mist/`; no PyTorch or training is needed for daily forecasts. The second script fetches one issued hourly weather response, builds count and mist inputs, and writes `site/data/forecast.json`. `NGULIA_DEMO=1` writes `site/data/forecast.demo.json` with live weather mapped to in-season example dates. GitHub Actions runs the same pipeline twice daily during the ringing window and archives issued public forecasts.
+The shared update script writes `site/data/forecast.json`. Set `NGULIA_DEMO=1` to write example in-season dates using current weather. [Data provenance](raw-data/provenance.md) describes the curated snapshot and eligibility rules.
 
-To preview the example forecast at any time, open `?demo=1` on the GitHub Pages site.
+<details>
+<summary>Reproduce the count model report</summary>
 
-## Research and alternatives
+```sh
+Rscript count/scripts/train.R
+Rscript count/scripts/validate.R
+Rscript count/scripts/build_report.R
+```
 
-- [Count assessment and contenders](research/count/README.md) — M2 validation, M3 annual adjustments and prior-morning rain.
-- [Mist assessment and contenders](research/mist/README.md) — retained CNN, matched logistic and climatology baselines.
-- [Count HTML report](validation/research/count_model_report.html) and [mist HTML report](validation/research/mist_model_report.html) — retrospective figures and detailed methods.
+`count/` owns the scripts, saved model, intermediate data and reports. Inputs come from `raw-data/daily_coverage.csv`. The main report is `count/reports/model.html`; the separate `count/reports/alternatives.html` preserves comparisons with annual adjustments and additional weather features. Their scripts are under `count/scripts/alternatives/`, with `count/scripts/build_alternatives_report.R` assembling that report.
 
-Both reports are also available on the website: [count report](https://a-rocha-kenya.github.io/ngulia-forcast/reports/count_model_report.html) and [mist report](https://a-rocha-kenya.github.io/ngulia-forcast/reports/mist_model_report.html). Deployment copies the committed reports and their interactive chart libraries into the site; research fitting is not rerun by this publishing step.
+</details>
 
-The reports use historical ERA5 weather. They do not establish accuracy of an issued online forecast. The production scripts are under `scripts/production/`; research reruns are under `scripts/experiments/count/` and `scripts/experiments/mist/`. Older discarded code and bulky outputs were removed from the repository working tree; the compact selection findings are in the research notes.
+## Mist probability
+
+**[Read the mist model report](https://a-rocha-kenya.github.io/ngulia-forcast/mist/model.html)** for the model description, interactive figures, calibration and validation.
+
+The forecast gives the probability of **any recorded mist**, including light or patchy mist. It averages three small convolutional neural networks using hourly cloud cover, humidity, wind components, temperature and dew-point depression from **21:00 on the previous evening through 08:00 on the ringing date**, in Ngulia local time.
+
+Training uses 1,184 observed dates in 43 seasons through 2013. Five whole-season validation folds give a **Brier score of 0.1675** and **AUC of 0.8103**, compared with a Brier score of 0.1845 for logistic regression using average weather. The report includes fold, calibration and mist-category diagnostics; [selection notes](mist/selection_notes.md) explain the tested windows and variants.
+
+The network weights and preprocessing metadata are saved in `mist/model/`. The shared forecast update runs them through `mist/scripts/predict.py` using NumPy; daily inference needs no neural-network training. Mist probability is displayed independently of the count estimate.
+
+This assessment also uses ERA5 weather. There are no observed mist labels after 2013 in the current dataset, so recent accuracy and performance with issued ECMWF weather remain unmeasured.
+
+<details>
+<summary>Reproduce the mist assessment</summary>
+
+Install `mist/requirements.txt` in a Python environment, then run:
+
+```sh
+MIST_PYTHON=/path/to/python bash mist/scripts/run.sh
+```
+
+The ERA5 hourly ZIP is stored locally in `raw-data/` (excluded from Git), copied from `ngulia-dataset`; override its location with `NGULIA_ERA5_ARCHIVE`. Fixed season folds are saved in `mist/season_folds.csv`, and generated results are under `mist/intermediate-data/`. Rebuild the report alone with `Rscript mist/scripts/03_build_report.R`.
+
+</details>
+
+`mist/` owns its scripts, model artifacts, intermediate data and report (`mist/reports/model.html`). The shared `scripts/update_forecast.R` fetches weather and runs both models; `scripts/publish_reports.py` includes their saved HTML reports in the website. Model training and validation run separately from the daily forecast refresh.
