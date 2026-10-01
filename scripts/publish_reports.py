@@ -71,7 +71,7 @@ for model in ('count', 'mist'):
         head = re.search(r'<head>(.*?)</head>', html, re.DOTALL).group(1)
         head = re.sub(r'<style>.*?</style>', '', head, flags=re.DOTALL)
         head += '\n<link rel="icon" href="../favicon.svg" type="image/svg+xml">'
-        head += '\n<link rel="stylesheet" href="../styles.css">\n<link rel="stylesheet" href="../reports.css">'
+        head += '\n<link rel="stylesheet" href="../styles.css?v=2">\n<link rel="stylesheet" href="../reports.css">'
         body = re.search(r'<body>(.*?)</body>', html, re.DOTALL).group(1)
         label = f'{model.title()} model' if path.name == 'model.html' else f'{model.title()} model comparisons'
         body = body.replace('<main>', f'<main class="report-content"><p class="report-kicker">{label}</p>', 1)

@@ -1,4 +1,4 @@
-import { loadSandbox } from "./sandbox.js";
+import { loadSandbox } from "./sandbox.js?v=2";
 import { updateForecastVisuals } from "./card-animation.js";
 
 const whole = new Intl.NumberFormat("en", { maximumFractionDigits: 0 });

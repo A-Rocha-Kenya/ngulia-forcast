@@ -4,6 +4,7 @@ import { updateForecastVisuals } from "./card-animation.js";
 const format = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
 const whole = new Intl.NumberFormat("en", { maximumFractionDigits: 0 });
 const dateLabel = new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+const ringingDateLabel = new Intl.DateTimeFormat("en", { day: "numeric", month: "short", timeZone: "UTC" });
 const dayMs = 86400000;
 const iso = date => date.toISOString().slice(0, 10);
 const day = date => new Date(`${date}T12:00:00Z`);
@@ -39,6 +40,20 @@ export async function loadSandbox() {
     c.min = c.key === "rain" ? Math.expm1(count.effects[c.variable].min) : count.effects[c.variable].min;
     c.max = c.key === "rain" ? Math.expm1(count.effects[c.variable].max) : count.effects[c.variable].max;
   });
+  // Compare catch variation across the central 90% of each observed input.
+  controls.forEach(c => {
+    const histogram = c.variable ? count.effects[c.variable].histogram : count.direction_histogram;
+    const total = histogram.count.reduce((sum, n) => sum + n, 0);
+    const limits = [0.05, 0.95].map(p => {
+      let cumulative = 0;
+      const value = histogram.x[histogram.count.findIndex(n => (cumulative += n) >= p * total)];
+      return c.key === "rain" ? Math.expm1(value) : value;
+    });
+    const means = Array.from({ length: 101 }, (_, i) => countMean(count,
+      scenarioInput(date, { ...defaults, [c.key]: limits[0] + i / 100 * (limits[1] - limits[0]) })));
+    c.importance = Math.max(...means) / Math.min(...means);
+  });
+  controls.sort((a, b) => b.importance - a.importance);
 
   document.body.classList.add("sandbox-mode");
   document.querySelector("#update-label").textContent = "Interactive forecast";
@@ -51,12 +66,15 @@ export async function loadSandbox() {
   section.className = "sandbox-controls";
   section.innerHTML = `<div class="sandbox-intro"><h2>Explore the forecast</h2>
     <p>Choose a ringing date and drag the weather markers. Both predictions update immediately.</p></div>
-    <div class="calendar-heading"><label for="scenario-date">Ringing date <input id="scenario-date" type="date"></label>
+    <div class="calendar-heading">
+      <label for="scenario-season">Season <select id="scenario-season">${years.map(y => `<option value="${y}">${y}–${String(y + 1).slice(-2)}</option>`).join("")}</select></label>
+      <label for="scenario-date">Ringing date <select id="scenario-date"></select></label>
+      <div class="date-stepper"><button id="date-previous" type="button" aria-label="Previous ringing date">‹</button><button id="date-next" type="button" aria-label="Next ringing date">›</button></div>
       <button id="calendar-expand" type="button" aria-expanded="false" aria-controls="sandbox-calendar"><span>Show other years</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
     <div id="sandbox-calendar" class="sandbox-calendar"></div>
     <div class="calendar-key"><span>Lower catch</span><i></i><span>Higher catch</span><span>◇ New moon</span></div>
     <div class="weather-heading"><h2>Shape the weather</h2><div class="sandbox-actions"><button id="scenario-copy" type="button">Copy scenario link</button><button id="weather-reset" type="button">Reset typical weather</button></div></div>
-    <p class="sandbox-note">Curves show the catch multiplier relative to typical weather. Shading is the 95% fitted-effect interval; wind curves combine speed and direction effects and have no interval. Histograms show observed training values. Drag the amber marker to change a value.</p>
+    <p class="sandbox-note">Panels run from larger to smaller effects on the predicted catch across typical observed weather, with other conditions held fixed. Curves show the catch multiplier relative to typical weather. Shading is the 95% fitted-effect interval; wind curves combine speed and direction effects and have no interval. Histograms show observed training values. Drag the amber marker to change a value.</p>
     <div id="scenario-weather" class="scenario-weather">${controls.map(c => `<article class="effect-card">
       <div class="effect-heading"><span>${c.label}</span><output id="value-${c.key}"></output></div>
       <svg id="plot-${c.key}" class="effect-plot" viewBox="0 0 380 240" role="slider" tabindex="0" aria-label="${c.label}" aria-valuemin="${c.min}" aria-valuemax="${c.max}"></svg>
@@ -87,11 +105,9 @@ export async function loadSandbox() {
     document.querySelector("#sandbox-calendar").innerHTML = `<svg viewBox="0 0 ${width} ${shown.length * rowHeight + 32}" aria-label="Season timing and moon opportunity calendar">${rows.map((row, j) => {
       const y = j * rowHeight;
       const selected = row.findIndex(r => r.date === date);
-      const points = row.map((r, i) => `${left + (i + 0.5) * cell},${y + 32 - r.mean / max * 25}`).join(" ");
       return `<g class="calendar-row" data-year="${shown[j]}" tabindex="0" role="slider" aria-label="${shown[j]} ringing date" aria-valuemin="1" aria-valuemax="85" aria-valuenow="${selected >= 0 ? selected + 1 : 1}" aria-valuetext="${selected >= 0 ? date : row[0].date}">
         <text x="44" y="${y + 37}" text-anchor="end">${shown[j]}</text>
         ${row.map((r, i) => `<rect x="${left + i * cell}" y="${y + 4}" width="${cell + 0.2}" height="50" fill="${color(r.mean)}"><title>${dateLabel.format(day(r.date))}: ${whole.format(r.mean)} birds with typical weather</title></rect>`).join("")}
-        <polyline class="calendar-curve" points="${points}"/>
         ${row.filter((r, i) => Math.abs(r.moon_days_from_new_moon) < 0.5).map(r => `<text class="new-moon" x="${left + (row.indexOf(r) + 0.5) * cell}" y="${y + 39}" text-anchor="middle">◆</text>`).join("")}
         ${selected >= 0 ? `<rect class="selected-day" x="${left + selected * cell}" y="${y + 1}" width="${cell}" height="56"/>` : ""}
         <rect class="calendar-hit" x="${left}" y="${y}" width="${85 * cell}" height="${rowHeight - 8}"/>
@@ -187,9 +203,14 @@ export async function loadSandbox() {
   function updateWeather() { controls.forEach(drawEffect); updateOutput(); }
   function updateDate() {
     const season = calendar(date).season;
-    document.querySelector("#scenario-date").min = `${season}-10-20`;
-    document.querySelector("#scenario-date").max = `${season + 1}-01-12`;
+    document.querySelector("#scenario-season").value = season;
+    document.querySelector("#scenario-date").innerHTML = Array.from({ length: 85 }, (_, i) => {
+      const value = iso(new Date(day(`${season}-10-20`).getTime() + i * dayMs));
+      return `<option value="${value}">${ringingDateLabel.format(day(value))}</option>`;
+    }).join("");
     document.querySelector("#scenario-date").value = date;
+    document.querySelector("#date-previous").disabled = calendar(date).season_day === 1;
+    document.querySelector("#date-next").disabled = calendar(date).season_day === 85;
     drawCalendar(); updateOutput();
   }
   controls.forEach(c => {
@@ -211,9 +232,17 @@ export async function loadSandbox() {
     svg.addEventListener("pointerup", event => svg.releasePointerCapture(event.pointerId));
   });
   document.querySelector("#scenario-date").addEventListener("change", event => {
-    if (!event.target.validity.valid || !event.target.value) return;
     date = event.target.value; updateDate();
   });
+  document.querySelector("#scenario-season").addEventListener("change", event => {
+    date = iso(new Date(day(`${event.target.value}-10-20`).getTime() + (calendar(date).season_day - 1) * dayMs));
+    updateDate();
+  });
+  for (const [id, offset] of [["date-previous", -1], ["date-next", 1]]) {
+    document.querySelector(`#${id}`).addEventListener("click", () => {
+      date = iso(new Date(day(date).getTime() + offset * dayMs)); updateDate();
+    });
+  }
   document.querySelector("#calendar-expand").addEventListener("click", event => {
     expanded = !expanded; event.currentTarget.setAttribute("aria-expanded", expanded);
     event.currentTarget.querySelector("span").textContent = expanded ? "Collapse years" : "Show other years"; drawCalendar();

@@ -299,7 +299,11 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 .sandbox-intro p, .sandbox-note { color: var(--muted); font-size: 0.85rem; }
 .calendar-heading, .weather-heading { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; margin-block: 24px 12px; }
 .calendar-heading label { display: grid; gap: 6px; color: var(--muted); font-size: 0.8rem; }
-.sandbox-controls input[type="date"], .sandbox-controls select, .sandbox-controls button { padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font: inherit; }
+.sandbox-controls select, .sandbox-controls button { min-height: 44px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font: inherit; }
+.sandbox-controls select { font-size: 16px; }
+.date-stepper { display: flex; gap: 8px; }
+.date-stepper button { width: 44px; padding: 0; font-size: 1.5rem; }
+.date-stepper button:disabled { opacity: 0.35; cursor: default; }
 .sandbox-controls button { cursor: pointer; font-size: 0.82rem; }
 .sandbox-controls button:hover, .sandbox-controls button:focus-visible { border-color: var(--cyan); }
 .sandbox-calendar { overflow-x: auto; padding-block: 8px; }
@@ -307,7 +311,6 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 .sandbox-calendar text { fill: var(--muted); font: 11px system-ui, sans-serif; }
 .calendar-guide { stroke: rgba(238, 247, 246, 0.2); pointer-events: none; }
 .december-guide { stroke: rgba(238, 247, 246, 0.8); stroke-dasharray: 2 4; pointer-events: none; }
-.calendar-curve { stroke: rgba(7, 17, 23, 0.65); stroke-width: 1.5; fill: none; pointer-events: none; }
 .sandbox-calendar .new-moon { fill: white; stroke: #14252c; stroke-width: 0.4; font-size: 14px; pointer-events: none; }
 .selected-day { fill: rgba(255,255,255,0.13); stroke: white; stroke-width: 2; pointer-events: none; }
 .calendar-hit { fill: transparent; cursor: crosshair; }
@@ -335,6 +338,8 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 .model-version a { color: var(--cyan); }
 @media (min-width: 1100px) { .scenario-weather { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 639px) {
+  .calendar-heading label { flex: 1; min-width: 130px; }
+  .calendar-heading select { width: 100%; }
   .scenario-weather { grid-template-columns: 1fr; }
   .sandbox-mode .today-card, .sandbox-mode .signal { padding: 16px; min-height: 170px; }
   .sandbox-mode .mist-meter { width: 80px; }
