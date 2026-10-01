@@ -1,4 +1,4 @@
-name: Update catch forecast
+name: Update Ngulia forecast
 
 on:
   workflow_dispatch:
@@ -39,13 +39,21 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::cli, any::dplyr, any::jsonlite, any::lubridate, any::mgcv, any::nnet, any::readr, any::tibble, any::tidyr
+          extra-packages: any::cli, any::dplyr, any::here, any::jsonlite, any::lubridate, any::mgcv, any::readr, any::tibble, any::tidyr
 
-      - name: Train forecast model
-        run: Rscript scripts/train_model.R
+      - name: Set up Python for mist inference
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Fetch weather and predict
-        run: Rscript scripts/update_forecast.R
+      - name: Install mist inference dependency
+        run: python -m pip install numpy
+
+      - name: Train count M2
+        run: Rscript scripts/production/count/train.R
+
+      - name: Fetch weather and predict count and mist
+        run: Rscript scripts/production/update_forecast.R
 
       - name: Archive issued forecast
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

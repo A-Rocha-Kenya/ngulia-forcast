@@ -172,7 +172,7 @@ function renderSeasonChart(values, displayDate) {
 
   container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="season-chart-title season-chart-desc">
     <title id="season-chart-title">Predicted catch across the ringing season</title>
-    <desc id="season-chart-desc">Date and moon baseline for the full season, with weather-adjusted expected catch and an 80 percent range where live weather is available.</desc>
+    <desc id="season-chart-desc">Typical-weather M2 count for the full season, with issued-weather expected catch and an 80 percent range where live weather is available.</desc>
     ${grid}
     ${rangeBand}
     <path class="baseline-path" d="${baselinePath}"></path>
@@ -219,8 +219,8 @@ function renderSeasonChart(values, displayDate) {
     hover.querySelector(".hover-tooltip").setAttribute("transform", `translate(${tooltipX} ${margin.top + 6})`);
     hover.querySelector(".hover-date").textContent = chartDate.format(parseDate(row.date));
     hover.querySelector(".hover-live").textContent = liveAvailable ? `Weather: ${whole.format(row.expected_catch)} birds` : "Weather: unavailable";
-    hover.querySelector(".hover-baseline").textContent = `Date + moon: ${whole.format(row.baseline_expected_catch)} birds`;
-    overlay.setAttribute("aria-label", `${chartDate.format(parseDate(row.date))}. ${liveAvailable ? `Weather forecast ${whole.format(row.expected_catch)} birds. ` : ""}Date and moon forecast ${whole.format(row.baseline_expected_catch)} birds.`);
+    hover.querySelector(".hover-baseline").textContent = `Typical weather: ${whole.format(row.baseline_expected_catch)} birds`;
+    overlay.setAttribute("aria-label", `${chartDate.format(parseDate(row.date))}. ${liveAvailable ? `Weather forecast ${whole.format(row.expected_catch)} birds. ` : ""}Typical-weather forecast ${whole.format(row.baseline_expected_catch)} birds.`);
   };
   overlay.addEventListener("pointermove", event => updateHover(event.clientX));
   overlay.addEventListener("pointerdown", event => updateHover(event.clientX));

@@ -1,45 +1,31 @@
-# Ngulia catch forecast
+# Ngulia daily forecast
 
-An independent, reproducible daily catch forecast for the Ngulia ringing season. The project trains from its own copy of the curated daily dataset, retrieves ECMWF IFS weather forecasts through Open-Meteo, and publishes a static dashboard with GitHub Actions and GitHub Pages.
+The website publishes **one count model and one mist model** from a shared Open-Meteo ECMWF hourly forecast. Count and mist are fitted independently; their probabilities and expected counts are displayed together, not multiplied.
 
-The forecast is a planning aid. It estimates catch conditional on ringing taking place; it is not an abundance estimate or a promise of a particular number of birds.
+| Output | Published model | Historical assessment | Main limitation |
+|---|---|---|---|
+| Expected daily catch, conditional on operation at front bush | M2 negative-binomial GAM: season day, moon, eight weather inputs, net layout and a smooth historical year term | Rolling 2014–2023 evaluation: mean Poisson deviance 522.7; mean absolute error 483 birds on 142 operated dates | Unmeasured annual effort/population variation; issued-weather error unmeasured |
+| Probability of any recorded mist | Three-member six-channel hourly CNN, previous 21:00 through 08:00 | Five whole-season folds through 2013: Brier 0.1675, log loss 0.5045, AUC 0.8103 on 1,184 dates | No field labels after 2013; issued-weather error unmeasured |
 
-## How it works
+The count model is fit through 2023. For future seasons the live forecast holds its fitted year term at 2023, avoiding an unchecked extrapolation of the historical smooth. This operational rule is explicit in the JSON model metadata; it has not been scored in the retrospective comparison. The mist ensemble is frozen through 2013. Neither model updates from current-year observations. A catch forecast assumes the front-bush layout and a ringing date; it does not predict whether ringing will occur.
 
-1. `scripts/train_model.R` fits two negative-binomial GAMs to historical positive-catch dates: date + moon, and date + moon + forecast-available weather. It also fits a multinomial model for the probability of light or good mist.
-2. `scripts/update_forecast.R` retrieves 15 days of hourly ECMWF IFS 0.25° forecasts from Open-Meteo and summarizes 00:00–08:00 Africa/Nairobi time.
-3. The forecast, 80% predictive range, historical-date percentile, mist probability, and full-season date-and-moon outlook are written to `site/data/forecast.json` and displayed by the static dashboard in `site/`.
-4. `.github/workflows/update-forecast.yml` runs twice daily during the ringing season, archives every issued forecast, and deploys the site to GitHub Pages.
+## Run the live pipeline
 
-## Local run
-
-Install the packages listed in `DESCRIPTION`, then run from the repository root:
-
-```r
-source("scripts/train_model.R")
-source("scripts/update_forecast.R")
-```
-
-Preview the site with:
+From the repository root, with the R packages in `DESCRIPTION` and Python NumPy installed:
 
 ```sh
-python3 -m http.server 8000 --directory site
+Rscript scripts/production/count/train.R
+Rscript scripts/production/update_forecast.R
 ```
 
-Then open <http://localhost:8000>.
+The first script writes the ignored count fit `model/count_m2.rds`. The mist weights and metadata are committed in `model/mist/`; no PyTorch or training is needed for daily forecasts. The second script fetches one issued hourly weather response, builds count and mist inputs, and writes `site/data/forecast.json`. `NGULIA_DEMO=1` writes `site/data/forecast.demo.json` with live weather mapped to in-season example dates. GitHub Actions runs the same pipeline twice daily during the ringing window and archives issued public forecasts.
 
-To preview the example forecast at any time, open `?demo=1` (for example, <http://localhost:8000/?demo=1>). The same query works on the GitHub Pages deployment.
+To preview the example forecast at any time, open `?demo=1` on the GitHub Pages site.
 
-## Model interpretation
+## Research and alternatives
 
-The main value is the model's expected daily catch, conditional on ringing taking place. The 80% range represents model uncertainty rather than a guarantee. The historical percentile compares the prediction with observed catches around the same point in the ringing season. Historical operation, lighting, net configuration, staffing, and zero-catch coverage remain incomplete, so the output should be used as operational context rather than a precise abundance forecast.
+- [Count assessment and contenders](research/count/README.md) — M2 validation, M3 annual adjustments and prior-morning rain.
+- [Mist assessment and contenders](research/mist/README.md) — retained CNN, matched logistic and climatology baselines.
+- [Count HTML report](validation/research/count_model_report.html) and [mist HTML report](validation/research/mist_model_report.html) — retrospective figures and detailed methods.
 
-Season-blocked validation is stored in `validation/forecast_model_cv.csv`. Realised ERA5 weather is used there as a best-case proxy for a perfect forecast. Every live forecast is archived so lead-time-specific performance can be evaluated prospectively.
-
-In the current blocked validation, adding direct weather reduces log-RMSE from 1.854 to 1.750 (5.6%) and log-MAE from 1.396 to 1.307 (6.4%). The highest-ranked 20% of dates contain 38.0% of historical catch, compared with 33.7% for date + moon alone. These values describe positive-catch dates and should not be read as performance for predicting whether ringing occurs.
-
-## Data provenance
-
-`data/daily_coverage.csv` is a snapshot copied on 2026-09-20 from the Ngulia data workspace at `A-Rocha-Kenya/Ngulia`. It contains one row per calendar date in the ringing-season scaffold and includes curated catch, calendar, lunar, operational, and ERA5 variables. The forecast scripts select only the columns needed for training.
-
-The dataset metadata specifies CC BY 4.0. Retain attribution to the Ngulia Ringing Project when redistributing it. Open-Meteo weather data and ECMWF model output remain subject to their respective attribution and use terms.
+The reports use historical ERA5 weather. They do not establish accuracy of an issued online forecast. The production scripts are under `scripts/production/`; research reruns are under `scripts/experiments/count/` and `scripts/experiments/mist/`. Older discarded code and bulky outputs were removed from the repository working tree; the compact selection findings are in the research notes.

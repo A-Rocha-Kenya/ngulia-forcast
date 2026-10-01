@@ -1,0 +1,43 @@
+{
+  "format_version": 1,
+  "target": "any_recorded_mist",
+  "features": [
+    "cloud",
+    "humidity",
+    "u",
+    "v",
+    "temperature",
+    "depression"
+  ],
+  "units": [
+    "fraction",
+    "percent",
+    "m/s",
+    "m/s",
+    "degC",
+    "degC"
+  ],
+  "timezone": "Africa/Nairobi",
+  "relative_hours": [
+    -3,
+    -2,
+    -1,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "seeds": [
+    73,
+    173,
+    273
+  ],
+  "first_training_date": "1971-11-27",
+  "last_training_date": "2013-12-13",
+  "version": "mist-cnn-2013-v1"
+}

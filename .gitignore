@@ -3,4 +3,17 @@
 .Rproj.user/
 .sites-runtime/
 model/*.rds
+validation/research/*.rds
 
+.venv-mist/
+__pycache__/
+validation/research/mist/*.rds
+validation/research/mist/artifacts/*.npz
+
+# Regenerable research intermediates; keep reports and concise score tables.
+validation/research/count_*.csv
+validation/research/mist/*.csv
+validation/research/mist/*.json
+validation/research/mist/*.txt
+validation/research/mist/artifacts/
+validation/research/*.txt

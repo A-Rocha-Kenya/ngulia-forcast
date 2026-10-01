@@ -1,0 +1,43 @@
+{
+  "target": "any_recorded_mist",
+  "last_label_season": 2013,
+  "features": [
+    "cloud",
+    "humidity",
+    "u",
+    "v",
+    "temperature",
+    "depression"
+  ],
+  "timezone": "Africa/Nairobi",
+  "seeds": [
+    73,
+    173,
+    273
+  ],
+  "hidden_channels": 8,
+  "kernel_size": 3,
+  "dropout": 0.1,
+  "learning_rate": 0.003,
+  "weight_decay": 0.02,
+  "batch_size": 128,
+  "max_epochs": 250,
+  "patience": 25,
+  "stopping_tolerance": 1e-05,
+  "bootstrap_seed": 20260929,
+  "bootstrap_replicates": 2000,
+  "relative_hours": [
+    -3,
+    -2,
+    -1,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ]
+}
