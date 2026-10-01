@@ -43,24 +43,18 @@ jobs:
         with:
           extra-packages: any::cli, any::dplyr, any::here, any::jsonlite, any::lubridate, any::mgcv, any::readr, any::tibble, any::tidyr
 
-      - name: Set up Python for mist inference
-        id: mist-python
-        uses: actions/setup-python@v5
+      - name: Set up shared JavaScript prediction
+        uses: actions/setup-node@v4
         with:
-          python-version: "3.12"
-
-      - name: Install mist inference dependency
-        run: |
-          "${{ steps.mist-python.outputs.python-path }}" -m venv .venv-forecast
-          .venv-forecast/bin/python -m pip install numpy
-          .venv-forecast/bin/python -c "import numpy; print(numpy.__version__)"
+          node-version: "22"
 
       - name: Train count model
-        run: Rscript count/scripts/train.R
+        run: |
+          Rscript count/scripts/train.R
+          Rscript scripts/export_models.R
+          node scripts/verify_javascript.mjs
 
       - name: Fetch weather and predict count and mist
-        env:
-          NGULIA_PYTHON: ${{ github.workspace }}/.venv-forecast/bin/python
         run: Rscript scripts/update_forecast.R
 
       - name: Archive issued forecast

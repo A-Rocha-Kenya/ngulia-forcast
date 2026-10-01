@@ -10,25 +10,27 @@ library(here)
 # Set paths and calendar ---------------------------------------------------
 cli_h1("Update Ngulia count and mist forecast")
 count_model <- readRDS(here("count", "model", "model.rds"))
-demo_mode <- identical(Sys.getenv("NGULIA_DEMO"), "1")
-output_path <- here("site", "data", if (demo_mode) "forecast.demo.json" else "forecast.json")
+output_path <- here("site", "data", "forecast.json")
 local_timezone <- "Africa/Nairobi"
 today_local <- as.Date(Sys.time(), tz = local_timezone)
-reference_new_moon <- ymd_hms("2000-01-06 18:14:00", tz = "UTC")
-synodic_month_days <- 29.530588853
 
-season_from_date <- function(date) if_else(month(date) >= 6, year(date), year(date) - 1L)
+# Use the same prediction implementation as the browser sandbox ------------
+predict_shared <- function(mode, input) {
+  input_path <- tempfile(fileext = ".json")
+  result_path <- tempfile(fileext = ".json")
+  write_json(input, input_path, dataframe = "rows", auto_unbox = TRUE, digits = 16)
+  status <- system2(Sys.getenv("NGULIA_NODE", "node"),
+    c(shQuote(here("scripts", "predict.mjs")), mode, shQuote(input_path), shQuote(result_path)))
+  stopifnot(status == 0)
+  result <- fromJSON(result_path)
+  unlink(c(input_path, result_path))
+  result
+}
+
 add_calendar <- function(data) {
-  data |>
-    mutate(season = season_from_date(date),
-      season_start = make_date(season, 10L, 20L),
+  bind_cols(data, as_tibble(predict_shared("calendar", data |> select(date)))) |>
+    mutate(season_start = make_date(season, 10L, 20L),
       season_end = make_date(season + 1L, 1L, 12L),
-      season_day = as.integer(date - season_start) + 1L,
-      moon_age_days = as.numeric(difftime(as_datetime(date, tz = "UTC") + hours(12),
-        reference_new_moon, units = "days")) %% synodic_month_days,
-      moon_days_from_new_moon = if_else(moon_age_days <= synodic_month_days / 2,
-        moon_age_days, moon_age_days - synodic_month_days),
-      moon_distance_from_new_moon = abs(as.integer(round(moon_days_from_new_moon))),
       in_season = date >= season_start & date <= season_end,
       model_season = pmin(season, 2023),
       bush_period = factor("front_bush", levels = c("back_bush", "front_bush")))
@@ -92,31 +94,22 @@ mist_hours <- hourly |>
 daily_weather <- semi_join(daily_weather, mist_hours, by = "weather_valid_date")
 stopifnot(nrow(mist_hours) == 12 * nrow(daily_weather),
   all(complete.cases(mist_hours)))
-mist_input <- tempfile(fileext = ".csv")
-mist_output <- tempfile(fileext = ".csv")
-write_csv(mist_hours, mist_input)
-python <- Sys.getenv("NGULIA_PYTHON", "python3")
-status <- system2(python, c(here("mist", "scripts", "predict.py"),
-  mist_input, mist_output, here("mist", "model")))
-stopifnot(status == 0)
-mist <- read_csv(mist_output, show_col_types = FALSE,
-  col_types = cols(weather_valid_date = col_date(), mist_probability_pct = col_double()))
-unlink(c(mist_input, mist_output))
+mist_input <- lapply(split(mist_hours, mist_hours$weather_valid_date), function(night)
+  list(weather_valid_date = as.character(night$weather_valid_date[[1]]),
+    hours = as.matrix(night |> select(cloud, humidity, u, v, temperature, depression))))
+mist <- as_tibble(predict_shared("mist", unname(mist_input))) |>
+  mutate(weather_valid_date = as.Date(weather_valid_date))
 daily_weather <- left_join(daily_weather, mist, by = "weather_valid_date")
 
 # Predict conditional catch with fixed front-bush layout ------------------
-if (demo_mode) {
-  demo_start <- ymd(Sys.getenv("NGULIA_DEMO_START", "2026-11-12"))
-  daily_weather <- daily_weather |> mutate(date = demo_start + row_number() - 1L)
-}
 daily_weather <- add_calendar(daily_weather)
 prediction_data <- daily_weather |> mutate(season = model_season)
-expected <- as.numeric(predict(count_model$fit, newdata = prediction_data, type = "response"))
+count_predictions <- predict_shared("count", prediction_data)
+expected <- count_predictions$expected_catch
 reference_data <- prediction_data
 reference_data[names(count_model$reference_weather)] <- count_model$reference_weather[
   rep(1, nrow(reference_data)), ]
-baseline <- as.numeric(predict(count_model$fit, newdata = reference_data, type = "response"))
-theta <- count_model$fit$family$getTheta(TRUE)
+baseline <- predict_shared("count", reference_data)$expected_catch
 reference_mean <- mean(fitted(count_model$fit))
 historical_percentile <- vapply(seq_len(nrow(prediction_data)), function(i) {
   reference <- count_model$historical_reference |>
@@ -128,8 +121,8 @@ daily_predictions <- daily_weather |>
   mutate(baseline_index = 100 * baseline / reference_mean,
     opportunity_index = 100 * expected / reference_mean,
     expected_catch = expected,
-    catch_low = qnbinom(0.1, mu = expected, size = theta),
-    catch_high = qnbinom(0.9, mu = expected, size = theta),
+    catch_low = count_predictions$catch_low,
+    catch_high = count_predictions$catch_high,
     historical_percentile = historical_percentile,
     weather_adjustment_pct = 100 * (expected / baseline - 1),
     forecast_lead_days = as.integer(date - min(date)),
@@ -154,8 +147,7 @@ season_dates <- tibble(date = seq(upcoming_start,
 season_dates[names(count_model$reference_weather)] <- count_model$reference_weather[
   rep(1, nrow(season_dates)), ]
 season_outlook <- season_dates |>
-  mutate(baseline_expected_catch = as.numeric(predict(count_model$fit,
-    newdata = season_dates, type = "response"))) |>
+  mutate(baseline_expected_catch = predict_shared("count", season_dates)$expected_catch) |>
   select(date, baseline_expected_catch, moon_distance_from_new_moon,
     moon_days_from_new_moon) |>
   left_join(daily_predictions |> select(date, expected_catch, catch_low, catch_high),
@@ -164,7 +156,7 @@ season_outlook <- season_dates |>
 
 # Publish one count and one mist model ------------------------------------
 payload <- list(generated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
-  demo_mode = demo_mode,
+  demo_mode = FALSE,
   source = list(provider = "Open-Meteo", model = "ECMWF IFS 0.25°",
     endpoint = "https://api.open-meteo.com/v1/ecmwf",
     latitude = -3.0142286, longitude = 38.2108675, timezone = local_timezone),

@@ -16,10 +16,12 @@ Rolling evaluation on 142 operated dates in 2014–2023 gives a mean absolute er
 
 The evaluation uses historical ERA5 weather. The rolling assessment holds the year effect at the last training year, matching the production rule. Accuracy with issued ECMWF weather still needs assessment using new observations. The model currently does not update from live capture counts.
 
-To train the count model and refresh both website predictions, run from the repository root with the R dependencies in `DESCRIPTION` and Python NumPy installed:
+To train the count model and refresh both website predictions, run from the repository root with the R dependencies in `DESCRIPTION` and Node.js 22 or later installed:
 
 ```sh
 Rscript count/scripts/train.R
+Rscript scripts/export_models.R
+node scripts/verify_javascript.mjs
 Rscript scripts/update_forecast.R
 ```
 
@@ -46,7 +48,7 @@ The forecast gives the probability of **any recorded mist**, including light or 
 
 Training uses 1,184 observed dates in 43 seasons through 2013. Five whole-season validation folds give a **Brier score of 0.1675** and **AUC of 0.8103**, compared with a Brier score of 0.1845 for logistic regression using average weather. The model guide explains the comparison and probability calibration, with detailed validation scores available to expand; [selection notes](mist/selection_notes.md) explain the tested windows and variants.
 
-The network weights and preprocessing metadata are saved in `mist/model/`. The shared forecast update runs them through `mist/scripts/predict.py` using NumPy; daily inference needs no neural-network training. Mist probability is displayed independently of the count estimate.
+The network weights and preprocessing metadata are saved in `mist/model/`. The shared forecast update runs their exported copies through `site/prediction.js`; daily inference needs no Python or neural-network training. Mist probability is displayed independently of the count estimate. The NumPy predictor remains a research reference for parity checks.
 
 This assessment also uses ERA5 weather. There are no observed mist labels after 2013 in the current dataset, so recent accuracy and performance with issued ECMWF weather remain unmeasured.
 
