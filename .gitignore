@@ -2,6 +2,7 @@
 .Rhistory
 .Rproj.user/
 .sites-runtime/
+site/reports/
 model/*.rds
 validation/research/*.rds
 

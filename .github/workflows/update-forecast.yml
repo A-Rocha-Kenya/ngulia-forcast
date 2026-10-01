@@ -8,6 +8,8 @@ on:
       - "data/**"
       - "scripts/**"
       - "site/**"
+      - "validation/research/**"
+      - "research/**"
       - "DESCRIPTION"
       - ".github/workflows/update-forecast.yml"
   schedule:
@@ -72,6 +74,9 @@ jobs:
           git add site/data/forecast.json forecast-archive
           git diff --cached --quiet || git commit -m "Archive forecast ${stamp}"
           git push
+
+      - name: Include count and mist reports
+        run: python scripts/production/publish_reports.py
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

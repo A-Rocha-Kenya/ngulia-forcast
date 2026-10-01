@@ -28,4 +28,6 @@ To preview the example forecast at any time, open `?demo=1` on the GitHub Pages 
 - [Mist assessment and contenders](research/mist/README.md) — retained CNN, matched logistic and climatology baselines.
 - [Count HTML report](validation/research/count_model_report.html) and [mist HTML report](validation/research/mist_model_report.html) — retrospective figures and detailed methods.
 
+Both reports are also available on the website: [count report](https://a-rocha-kenya.github.io/ngulia-forcast/reports/count_model_report.html) and [mist report](https://a-rocha-kenya.github.io/ngulia-forcast/reports/mist_model_report.html). Deployment copies the committed reports and their interactive chart libraries into the site; research fitting is not rerun by this publishing step.
+
 The reports use historical ERA5 weather. They do not establish accuracy of an issued online forecast. The production scripts are under `scripts/production/`; research reruns are under `scripts/experiments/count/` and `scripts/experiments/mist/`. Older discarded code and bulky outputs were removed from the repository working tree; the compact selection findings are in the research notes.
