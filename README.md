@@ -2,7 +2,7 @@
 
 [Open the forecast website](https://a-rocha-kenya.github.io/ngulia-forcast/) · [Explore the forecast](https://a-rocha-kenya.github.io/ngulia-forcast/explore/)
 
-The website predicts daily capture count and the probability of mist at Ngulia. Both models use the same issued Open-Meteo ECMWF hourly forecast, with separate inputs and predictions. The scheduled pipeline refreshes the website twice daily during the ringing season and archives issued forecasts for later assessment.
+The website predicts daily capture count and the probability of mist at Ngulia. Both models use the same issued Open-Meteo ECMWF hourly forecast, with separate inputs and predictions. The scheduled pipeline refreshes the website twice daily during the ringing season without committing or archiving generated forecasts.
 
 ## Daily capture count
 
@@ -25,7 +25,7 @@ node scripts/verify_javascript.mjs
 Rscript scripts/update_forecast.R
 ```
 
-The shared update script writes `site/data/forecast.json`. The Explore page at `/explore/` runs interactively from the exported model files; it does not shift issued weather onto invented dates. [Data provenance](raw-data/provenance.md) describes the curated snapshot and eligibility rules.
+The shared update script writes `site/data/forecast.json` for the website deployment. This generated file and issued forecast archives are excluded from Git; the website only needs the latest forecast. The Explore page at `/explore/` runs interactively from the exported model files; it does not shift issued weather onto invented dates. [Data provenance](raw-data/provenance.md) describes the curated snapshot and eligibility rules.
 
 ## Explore the forecast and shared prediction
 

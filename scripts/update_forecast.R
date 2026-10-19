@@ -168,6 +168,7 @@ payload <- list(generated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UT
     next_season_start = format(next_season_start(today_local), "%Y-%m-%d"),
     forecast_dates_in_season = nrow(daily_predictions)),
   forecast = daily_predictions, season_outlook = season_outlook)
+dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
 write_json(payload, output_path, pretty = TRUE, auto_unbox = TRUE,
   na = "null", dataframe = "rows", digits = 4)
 cli_alert_success("Wrote {nrow(daily_predictions)} count and mist forecast dates to {output_path}")

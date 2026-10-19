@@ -18,7 +18,7 @@ on:
     - cron: "17 3,15 1-15 1 *"
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -32,8 +32,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
@@ -56,18 +54,6 @@ jobs:
 
       - name: Fetch weather and predict count and mist
         run: Rscript scripts/update_forecast.R
-
-      - name: Archive issued forecast
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        run: |
-          stamp=$(date -u +'%Y%m%dT%H%M%SZ')
-          mkdir -p forecast-archive
-          cp site/data/forecast.json "forecast-archive/${stamp}.json"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data/forecast.json forecast-archive
-          git diff --cached --quiet || git commit -m "Archive forecast ${stamp}"
-          git push
 
       - name: Include count and mist reports
         run: python scripts/publish_reports.py

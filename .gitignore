@@ -32,3 +32,7 @@ mist/intermediate-data/*
 !mist/intermediate-data/category_scores.csv
 
 raw-data/*.zip
+
+# Forecasts are generated for deployment, not retained in Git.
+forecast-archive/
+site/data/forecast.json
