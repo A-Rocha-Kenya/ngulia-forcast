@@ -6,32 +6,42 @@
     <meta name="theme-color" content="#071117">
     <meta name="description" content="Daily bird capture and mist forecasts for the Ngulia ringing season.">
     <title>Live forecast | Ngulia</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css?v=7">
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="./" aria-label="Ngulia forecast home">
-        <span class="brand-mark" aria-hidden="true">N</span>
-        <span><strong>Ngulia</strong><small>forecast</small></span>
-      </a>
-      <nav class="site-nav" aria-label="Main navigation">
-        <a id="nav-live" href="./">Live</a>
-        <a id="nav-explore" href="explore/">Explore</a>
-        <a href="count/">Count model</a>
-        <a href="mist/">Mist model</a>
-      </nav>
-      <div class="update-state"><span class="pulse" aria-hidden="true"></span><span id="update-label">Loading…</span></div>
+      <div class="site-header-inner">
+        <a class="brand" href="./" aria-label="Ngulia forecast home">
+          <span class="brand-glow" aria-hidden="true"></span>
+          <span class="brand-text"><strong>Ngulia</strong><span>Bird Migration Project</span></span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a id="nav-live" href="./">Live</a>
+          <a id="nav-explore" href="explore/">Explore</a>
+          <a href="count/">Count model</a>
+          <a href="mist/">Mist model</a>
+        </nav>
+        <details class="mobile-nav">
+          <summary aria-label="Open forecast menu"><span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span></summary>
+          <nav class="mobile-nav-panel" aria-label="Mobile navigation">
+            <span class="mobile-nav-label">Forecast</span>
+            <a id="mobile-nav-live" href="./">Live</a>
+            <a id="mobile-nav-explore" href="explore/">Explore</a>
+            <a href="count/">Count model</a>
+            <a href="mist/">Mist model</a>
+          </nav>
+        </details>
+        <div class="update-state"><span class="pulse" aria-hidden="true"></span><span id="update-label">Loading…</span></div>
+      </div>
     </header>
 
     <main>
       <section class="live-section" aria-labelledby="live-title" aria-live="polite">
         <div class="live-cards">
           <article class="today-card">
-            <div class="section-kicker">
-              <h1 id="live-title">Today</h1>
-            </div>
-            <p class="live-date" id="primary-date">Tonight</p>
+            <h1 class="sr-only" id="live-title">Today</h1>
+            <p class="live-date" id="primary-date">Today</p>
             <div class="catch-reading">
               <span class="catch-value" id="primary-catch">—</span>
               <span class="catch-unit">birds expected</span>
@@ -71,8 +81,8 @@
           <h2 id="season-title">Entire season</h2>
         </div>
         <div class="season-legend">
-          <span><i class="line-live"></i> Weather forecast</span>
-          <span><i class="line-baseline"></i> Typical weather</span>
+          <span><i class="line-live"></i> Forecast</span>
+          <span><i class="line-baseline"></i> Seasonal average</span>
         </div>
         <div id="season-chart" class="season-chart"></div>
       </section>
@@ -100,6 +110,6 @@
       </form>
     </dialog>
 
-    <script src="app.js?v=2" type="module"></script>
+    <script src="app.js?v=9" type="module"></script>
   </body>
 </html>

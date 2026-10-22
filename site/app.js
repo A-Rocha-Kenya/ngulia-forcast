@@ -3,16 +3,22 @@ import { updateForecastVisuals } from "./card-animation.js";
 
 const whole = new Intl.NumberFormat("en", { maximumFractionDigits: 0 });
 const oneDecimal = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
-const weekday = new Intl.DateTimeFormat("en", { weekday: "short", timeZone: "UTC" });
 const dayMonth = new Intl.DateTimeFormat("en", { day: "numeric", month: "short", timeZone: "UTC" });
-const longDate = new Intl.DateTimeFormat("en", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+const longDate = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 const chartDate = new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 const monthName = new Intl.DateTimeFormat("en", { month: "short", timeZone: "UTC" });
 const exploreMode = /\/explore\/(?:index\.html)?$/.test(window.location.pathname) || new URLSearchParams(window.location.search).get("demo") === "1";
-document.querySelector(exploreMode ? "#nav-explore" : "#nav-live").setAttribute("aria-current", "page");
+document.querySelectorAll(exploreMode ? "#nav-explore, #mobile-nav-explore" : "#nav-live, #mobile-nav-live").forEach(link => link.setAttribute("aria-current", "page"));
 document.title = `${exploreMode ? "Explore forecast" : "Live forecast"} | Ngulia`;
 
 const parseDate = value => new Date(`${value}T12:00:00Z`);
+
+function ringingDate(value) {
+  const date = parseDate(value);
+  const day = date.getUTCDate();
+  const suffix = day >= 11 && day <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" }[day % 10] || "th");
+  return longDate.format(date).replace(" ", ", ").replace(String(day), `${day}${suffix} of`);
+}
 
 function moonPhase(signedDays) {
   const distance = Math.abs(signedDays);
@@ -35,19 +41,9 @@ function moonSymbol(signedDays) {
   const waxing = phaseAngle <= Math.PI;
   const distanceFromNew = waxing ? phaseAngle : 2 * Math.PI - phaseAngle;
   const terminatorFactor = Math.cos(distanceFromNew);
-  const terminator = [];
-  const limb = [];
-
-  for (let i = 0; i <= 28; i += 1) {
-    const localY = -radius + 2 * radius * i / 28;
-    const halfWidth = Math.sqrt(Math.max(0, radius * radius - localY * localY));
-    const terminatorX = waxing ? terminatorFactor * halfWidth : -terminatorFactor * halfWidth;
-    terminator.push([centre + terminatorX, centre + localY]);
-    limb.push([centre + (waxing ? halfWidth : -halfWidth), centre + localY]);
-  }
-
-  const points = [...terminator, ...limb.reverse()];
-  const path = points.map(([x, y], index) => `${index ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`).join(" ") + " Z";
+  const terminatorRadius = Math.abs(terminatorFactor) * radius;
+  const terminatorSweep = (waxing ? terminatorFactor : -terminatorFactor) >= 0 ? 1 : 0;
+  const path = `M${centre},${centre - radius} A${terminatorRadius.toFixed(4)},${radius} 0 0 ${terminatorSweep} ${centre},${centre + radius} A${radius},${radius} 0 0 ${waxing ? 0 : 1} ${centre},${centre - radius} Z`;
   return `<svg viewBox="0 0 50 50" role="img" aria-label="${moonPhase(signedDays).label}">
     <circle class="moon-disc" cx="25" cy="25" r="22"></circle>
     <path class="moon-light" d="${path}"></path>
@@ -61,6 +57,7 @@ function weatherMarkup(day) {
     ["Low cloud", `${whole.format(day.low_cloud_cover_mean_pct)}%`],
     ["Humidity", `${whole.format(day.relative_humidity_mean_pct)}%`],
     ["Wind", `${oneDecimal.format(day.wind_speed_10m_mean_ms)} m/s`],
+    ["Wind direction", `${whole.format(day.wind_direction_10m_mean_deg)}° ${["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(day.wind_direction_10m_mean_deg / 45) % 8]}`],
     ["Temperature", `${oneDecimal.format(day.temperature_2m_mean_c)}°C`],
     ["Pressure", `${whole.format(day.surface_pressure_mean_hpa)} hPa`]
   ];
@@ -81,9 +78,10 @@ function setLive(day) {
   }
 
   const phase = moonPhase(day.moon_days_from_new_moon);
-  document.querySelector("#primary-date").textContent = longDate.format(parseDate(day.date));
+  document.querySelector("#primary-date").textContent = "Today";
   document.querySelector("#primary-catch").textContent = whole.format(day.expected_catch);
   document.querySelector("#catch-range").textContent = `Likely range ${whole.format(day.catch_low)}–${whole.format(day.catch_high)} birds`;
+  document.querySelector("#catch-range").setAttribute("aria-label", `80% likely range: ${whole.format(day.catch_low)}–${whole.format(day.catch_high)} birds`);
   document.querySelector("#catch-context").textContent = `Higher than ${whole.format(day.historical_percentile)}% of historical catches around this date.`;
   document.querySelector("#moon-icon").innerHTML = moonSymbol(day.moon_days_from_new_moon);
   document.querySelector("#moon-phase").textContent = phase.label;
@@ -101,8 +99,9 @@ function renderNextDays(days) {
 
   container.innerHTML = days.map(day => {
     return `<article class="day-card">
-      <div class="day-date"><strong>${weekday.format(parseDate(day.date))}</strong><span>${dayMonth.format(parseDate(day.date))}</span></div>
-      <div class="day-catch"><strong>${whole.format(day.expected_catch)} birds</strong><span>${whole.format(day.catch_low)}–${whole.format(day.catch_high)} likely</span></div>
+      <p class="day-date">${ringingDate(day.date)}</p>
+      <div class="catch-reading"><span class="catch-value">${whole.format(day.expected_catch)}</span><span class="catch-unit">birds</span></div>
+      <p class="catch-range" aria-label="80% likely range: ${whole.format(day.catch_low)}–${whole.format(day.catch_high)} birds"><span class="range-label">Likely range</span> ${whole.format(day.catch_low)}–${whole.format(day.catch_high)}</p>
       <div class="day-signals">
         <span class="day-moon">${moonSymbol(day.moon_days_from_new_moon)}</span>
         <span class="day-mist"><strong>${whole.format(day.mist_probability_pct)}%</strong><span>mist</span></span>
@@ -192,7 +191,7 @@ function renderSeasonChart(values, displayDate) {
       <circle class="hover-marker baseline-marker" r="4"></circle>
       <circle class="hover-marker live-marker" r="4"></circle>
       <g class="hover-tooltip">
-        <rect width="174" height="58" rx="7"></rect>
+        <rect width="210" height="58" rx="7"></rect>
         <text class="hover-date" x="10" y="17"></text>
         <text class="hover-live" x="10" y="34"></text>
         <text class="hover-baseline" x="10" y="50"></text>
@@ -210,7 +209,7 @@ function renderSeasonChart(values, displayDate) {
     const index = Math.max(0, Math.min(values.length - 1, Math.round((svgX - margin.left) * (values.length - 1) / plotWidth)));
     const row = values[index];
     const pointX = x(index);
-    const tooltipX = Math.min(width - margin.right - 174, Math.max(margin.left, pointX + 10));
+    const tooltipX = Math.min(width - margin.right - 210, Math.max(margin.left, pointX + 10));
     const liveAvailable = row.expected_catch != null;
     hover.removeAttribute("hidden");
     hover.querySelector(".hover-guide").setAttribute("x1", pointX);
@@ -224,9 +223,9 @@ function renderSeasonChart(values, displayDate) {
     }
     hover.querySelector(".hover-tooltip").setAttribute("transform", `translate(${tooltipX} ${margin.top + 6})`);
     hover.querySelector(".hover-date").textContent = chartDate.format(parseDate(row.date));
-    hover.querySelector(".hover-live").textContent = liveAvailable ? `Weather: ${whole.format(row.expected_catch)} birds` : "Weather: unavailable";
-    hover.querySelector(".hover-baseline").textContent = `Typical weather: ${whole.format(row.baseline_expected_catch)} birds`;
-    overlay.setAttribute("aria-label", `${chartDate.format(parseDate(row.date))}. ${liveAvailable ? `Weather forecast ${whole.format(row.expected_catch)} birds. ` : ""}Typical-weather forecast ${whole.format(row.baseline_expected_catch)} birds.`);
+    hover.querySelector(".hover-live").textContent = liveAvailable ? `Forecast: ${whole.format(row.expected_catch)} birds` : "Forecast: unavailable";
+    hover.querySelector(".hover-baseline").textContent = `Seasonal average: ${whole.format(row.baseline_expected_catch)} birds`;
+    overlay.setAttribute("aria-label", `${chartDate.format(parseDate(row.date))}. ${liveAvailable ? `Forecast ${whole.format(row.expected_catch)} birds. ` : ""}Seasonal average ${whole.format(row.baseline_expected_catch)} birds.`);
   };
   overlay.addEventListener("pointermove", event => updateHover(event.clientX));
   overlay.addEventListener("pointerdown", event => updateHover(event.clientX));
@@ -242,9 +241,18 @@ async function loadForecast() {
     if (!response.ok) throw new Error(`Forecast request failed: ${response.status}`);
     const data = await response.json();
     const generated = new Date(data.generated_at);
-    document.querySelector("#update-label").textContent = data.forecast.length
-        ? `ECMWF live · updated ${generated.toLocaleString("en", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`
-        : `Forecast starts ${dayMonth.format(parseDate(data.status.next_season_start))}`;
+    if (data.forecast.length) {
+      const updateAge = () => {
+        const minutes = Math.max(1, Math.round((Date.now() - generated) / 60000));
+        const amount = minutes < 60 ? minutes : Math.round(minutes / 60);
+        const unit = minutes < 60 ? "minute" : "hour";
+        document.querySelector("#update-label").textContent = `Live forecast · updated ${amount} ${unit}${amount === 1 ? "" : "s"} ago`;
+      };
+      updateAge();
+      setInterval(updateAge, 60000);
+    } else {
+      document.querySelector("#update-label").textContent = `Forecast starts ${dayMonth.format(parseDate(data.status.next_season_start))}`;
+    }
     setLive(data.forecast[0]);
     renderNextDays(data.forecast.slice(1, 6));
     const displayDate = new Date().toLocaleDateString("en-CA", { timeZone: data.source.timezone });

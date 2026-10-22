@@ -35,11 +35,10 @@ add_calendar <- function(data) {
       model_season = pmin(season, 2023),
       bush_period = factor("front_bush", levels = c("back_bush", "front_bush")))
 }
-next_season_start <- function(today) {
-  this_year <- make_date(year(today), 10L, 20L)
+outlook_season_start <- function(today) {
   this_season_end <- make_date(year(today), 1L, 12L)
   if (today <= this_season_end) make_date(year(today) - 1L, 10L, 20L) else
-    if (today <= this_year) this_year else make_date(year(today) + 1L, 10L, 20L)
+    make_date(year(today), 10L, 20L)
 }
 
 # Fetch one issued ECMWF hourly forecast for both models ------------------
@@ -140,9 +139,9 @@ daily_predictions <- daily_weather |>
   mutate(across(where(is.numeric), ~ round(.x, 1)))
 
 # Build the calendar and reference-weather outlook ------------------------
-upcoming_start <- next_season_start(today_local)
-season_dates <- tibble(date = seq(upcoming_start,
-  make_date(year(upcoming_start) + 1L, 1L, 12L), by = "day")) |>
+outlook_start <- outlook_season_start(today_local)
+season_dates <- tibble(date = seq(outlook_start,
+  make_date(year(outlook_start) + 1L, 1L, 12L), by = "day")) |>
   add_calendar() |> mutate(season = model_season)
 season_dates[names(count_model$reference_weather)] <- count_model$reference_weather[
   rep(1, nrow(season_dates)), ]
@@ -165,7 +164,7 @@ payload <- list(generated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UT
     response = "Catch conditional on operation and front-bush layout",
     reference_index = 100, year_trend_after_2023 = "held at 2023 level")),
   status = list(in_season = any(daily_weather$in_season),
-    next_season_start = format(next_season_start(today_local), "%Y-%m-%d"),
+    next_season_start = format(outlook_start, "%Y-%m-%d"),
     forecast_dates_in_season = nrow(daily_predictions)),
   forecast = daily_predictions, season_outlook = season_outlook)
 dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)

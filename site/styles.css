@@ -44,7 +44,6 @@ body::before {
   filter: blur(28px);
 }
 
-.site-header,
 main,
 footer {
   width: min(100% - 28px, 1380px);
@@ -52,42 +51,41 @@ footer {
 }
 
 .site-header {
-  min-height: 72px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(16px);
+  background: linear-gradient(180deg, rgba(5, 10, 15, 0.88), rgba(5, 10, 15, 0.55));
+  border-bottom: 1px solid rgba(243, 239, 230, 0.08);
+  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  color: #f3efe6;
+}
+.site-header-inner {
+  width: min(1180px, calc(100% - 2rem));
+  min-height: 76px;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  border-bottom: 1px solid rgba(145, 168, 170, 0.16);
+  gap: 1rem;
 }
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  text-decoration: none;
-}
-
-.brand-mark {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--cyan);
+.brand { display: inline-flex; align-items: center; gap: 0.85rem; min-width: 0; text-decoration: none; }
+.brand-glow {
+  flex: 0 0 auto;
+  width: 1.35rem;
+  height: 1.35rem;
   border-radius: 50%;
-  color: var(--cyan);
-  font-family: Georgia, serif;
-  font-size: 1rem;
+  background: radial-gradient(circle, #ffd978, rgba(242, 193, 78, 0.5) 42%, rgba(242, 193, 78, 0) 74%);
+  box-shadow: 0 0 24px rgba(255, 217, 120, 0.42);
 }
-
-.brand strong,
-.brand small { display: block; }
-.brand strong { font-family: Georgia, serif; font-size: 1.05rem; line-height: 1; }
-.brand small { margin-top: 3px; color: var(--muted); font-size: 0.64rem; letter-spacing: 0.11em; text-transform: uppercase; }
-
-.site-nav { display: flex; align-items: center; gap: 4px; margin-inline: auto; }
-.site-nav a { padding: 8px 12px; border-radius: 8px; color: var(--muted); font-size: 0.82rem; text-decoration: none; white-space: nowrap; }
-.site-nav a:hover, .site-nav a:focus-visible { color: var(--ink); background: var(--panel); }
-.site-nav a[aria-current="page"] { color: var(--cyan); background: rgba(91, 215, 210, 0.08); }
+.brand-text { display: grid; gap: 0.08rem; line-height: 1; }
+.brand-text strong { font-size: 1rem; letter-spacing: 0.03em; }
+.brand-text > span { color: #a8b3c2; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.site-nav { display: flex; align-items: center; gap: 0.35rem; }
+.site-nav a { padding: 0.9rem; color: inherit; font-size: 0.9rem; text-decoration: none; white-space: nowrap; border-radius: 0.8rem; }
+.site-nav a:hover, .site-nav a:focus-visible, .site-nav a[aria-current="page"] { color: #ffd978; background: rgba(255, 217, 120, 0.08); }
+.mobile-nav { display: none; }
+.site-header a:focus-visible, .mobile-nav summary:focus-visible { outline: 2px solid #ffd978; outline-offset: 3px; }
 
 .update-state {
   max-width: 155px;
@@ -123,18 +121,19 @@ section + section { margin-top: 58px; }
   text-transform: uppercase;
 }
 
-.live-date {
-  margin: 20px 0 3px;
-  color: var(--muted);
-  font-size: 1rem;
-  font-weight: 650;
-}
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.live-date, .day-date { margin: 0 0 24px; color: var(--muted); font-size: clamp(0.75rem, 1.1vw, 0.9rem); font-weight: 650; white-space: nowrap; }
 
-.catch-reading { display: flex; align-items: end; gap: 12px; }
-.catch-value { font-family: Georgia, serif; font-size: clamp(5.8rem, 30vw, 8.5rem); line-height: 0.78; letter-spacing: -0.065em; color: var(--amber); }
-.catch-unit { max-width: 78px; padding-bottom: 9px; color: var(--muted); font-size: 0.9rem; line-height: 1.15; }
-.catch-range { margin: 26px 0 4px; font-size: 1.05rem; font-weight: 650; }
+.catch-reading { display: flex; align-items: baseline; gap: 10px; }
+.catch-value { font-family: Georgia, serif; font-size: clamp(3rem, 4.5vw, 4rem); line-height: 1; letter-spacing: -0.065em; color: var(--amber); }
+.catch-unit {  color: var(--muted); font-size: 0.9rem; line-height: 1.15; }
+.catch-range { margin: 12px 0 18px; font-size: 1.05rem; font-weight: 650; }
 .catch-context { min-height: 23px; margin: 0; color: var(--muted); font-size: 0.9rem; }
+.today-card .live-date { font-size: 1rem; }
+.today-card .catch-reading { align-items: end; }
+.today-card .catch-value { font-size: clamp(5.8rem, 30vw, 8.5rem); line-height: 0.78; }
+.today-card .catch-unit { max-width: 78px; padding-bottom: 9px; }
+.today-card .catch-range { margin: 26px 0 4px; }
 
 .live-cards {
   display: grid;
@@ -156,15 +155,15 @@ section + section { margin-top: 58px; }
 .today-card, .mist-signal { box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 222, 148, 0.035); }
 
 .today-card { min-height: 252px; }
-.signal { min-height: 188px; }
+.signal { min-height: 188px; display: grid; grid-template-rows: 1fr auto 1fr; justify-items: center; }
 
-.signal-label { display: block; color: var(--muted); font-size: 0.72rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; }
-.moon-icon { display: block; width: 4.5rem; height: 4.5rem; margin: 20px 0 8px; }
+.signal-label { display: block; align-self: start; justify-self: start; color: var(--muted); font-size: 0.72rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; }
+.moon-icon { display: block; width: 4.5rem; height: 4.5rem; }
 .moon-icon svg, .day-moon svg { display: block; width: 100%; height: 100%; }
 .moon-disc { fill: #14252c; }
 .moon-light { fill: #e5c777; }
 .moon-outline { fill: none; stroke: rgba(238, 247, 246, 0.28); stroke-width: 1.2; }
-.moon-signal strong { display: block; font-size: 1.2rem; }
+.moon-signal strong { display: block; align-self: start; margin-top: 8px; font-size: 1.2rem; text-align: center; }
 .mist-reading { display: flex; align-items: baseline; gap: 2px; }
 .mist-reading strong { font-family: Georgia, serif; font-size: 2.4rem; font-weight: 500; line-height: 1; }
 .mist-reading span { color: var(--muted); }
@@ -172,7 +171,7 @@ section + section { margin-top: 58px; }
   --mist-percent: 0%;
   width: 110px;
   aspect-ratio: 1;
-  margin: 18px auto 0;
+  grid-row: 2;
   display: grid;
   place-items: center;
   position: relative;
@@ -196,13 +195,10 @@ section + section { margin-top: 58px; }
 .section-heading h2 { margin: 0; font-family: Georgia, serif; font-size: 2rem; font-weight: 500; line-height: 1; }
 
 .next-days { display: grid; gap: 9px; }
-.day-card { display: grid; grid-template-columns: 72px 1fr auto; align-items: center; gap: 12px; padding: 16px; border-radius: 16px; background: var(--panel-soft); }
-.day-date strong, .day-date span { display: block; }
-.day-date strong { font-size: 0.95rem; }
-.day-date span { color: var(--muted); font-size: 0.75rem; }
-.day-catch strong { display: block; font-family: Georgia, serif; font-size: 1.7rem; font-weight: 500; line-height: 1; }
-.day-catch span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.72rem; }
-.day-signals { display: flex; align-items: center; gap: 10px; text-align: right; }
+.day-card { min-width: 0; padding: 16px; border-radius: 16px; background: var(--panel-soft); }
+.day-card .catch-range { display: flex; align-items: baseline; gap: 6px; font-size: 0.9rem; }
+.range-label { color: var(--muted); font-size: 0.75rem; font-weight: 400; }
+.day-signals { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .day-moon { width: 2rem; height: 2rem; }
 .day-mist strong, .day-mist span { display: block; }
 .day-mist strong { font-size: 0.95rem; }
@@ -241,24 +237,39 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 .github-link svg { width: 17px; height: 17px; fill: currentColor; }
 .github-link:hover, .github-link:focus-visible { color: var(--ink); }
 
-@media (max-width: 899px) {
-  .site-header { flex-wrap: wrap; padding-block: 16px 10px; gap: 14px; }
-  .site-nav { order: 3; width: 100%; justify-content: center; }
-  .site-nav a { padding: 8px 10px; }
-  .update-state { margin-left: auto; }
+@media (max-width: 900px) {
+  .site-header-inner { flex-wrap: wrap; gap: 0; padding-block: 8px; }
+  .site-nav { display: none; }
+  .mobile-nav { display: block; margin-left: auto; }
+  .mobile-nav summary { display: flex; align-items: center; justify-content: center; list-style: none; cursor: pointer; width: 4.7rem; height: 3.8rem; border-radius: 999px; border: 1px solid rgba(243, 239, 230, 0.12); background: rgba(255, 255, 255, 0.03); }
+  .mobile-nav summary::-webkit-details-marker { display: none; }
+  .mobile-nav[open] summary { background: rgba(255, 217, 120, 0.08); border-color: rgba(255, 217, 120, 0.24); }
+  .menu-icon { display: grid; gap: 0.28rem; }
+  .menu-icon span { width: 1.35rem; height: 2px; border-radius: 999px; background: currentColor; }
+  .mobile-nav[open] .menu-icon span:nth-child(1) { transform: translateY(0.405rem) rotate(45deg); }
+  .mobile-nav[open] .menu-icon span:nth-child(2) { opacity: 0; }
+  .mobile-nav[open] .menu-icon span:nth-child(3) { transform: translateY(-0.405rem) rotate(-45deg); }
+  .mobile-nav-panel { position: absolute; right: max(1rem, calc((100% - 1180px) / 2)); top: calc(100% + 0.5rem); width: min(22rem, calc(100% - 2rem)); display: grid; gap: 0.2rem; padding: 0.8rem; border: 1px solid rgba(243, 239, 230, 0.12); border-radius: 1rem; background: rgba(8, 14, 21, 0.97); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45); }
+  .mobile-nav-label { padding: 0.4rem 0.8rem; color: #ffd978; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .mobile-nav-panel a { padding: 0.65rem 0.8rem; border-radius: 0.8rem; color: #a8b3c2; text-decoration: none; }
+  .mobile-nav-panel a:hover, .mobile-nav-panel a[aria-current="page"] { color: #f3efe6; background: rgba(255, 217, 120, 0.08); }
+  .update-state { width: 100%; max-width: none; justify-content: flex-start; padding-block: 5px 1px; text-align: left; }
+}
+
+@media (max-width: 480px) {
+  .brand-text > span { display: none; }
+  .site-header-inner { width: calc(100% - 1rem); }
 }
 
 @media (min-width: 640px) {
-  .site-header { min-height: 82px; }
   main { padding-top: 42px; }
-  .weather-grid { grid-template-columns: repeat(4, 1fr); }
+  .weather-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .next-days { grid-template-columns: repeat(3, 1fr); }
-  .day-card { grid-template-columns: 1fr; align-items: start; min-height: 188px; }
+  .day-card { min-height: 188px; }
   .day-signals { justify-content: space-between; text-align: left; }
 }
 
 @media (min-width: 900px) {
-  .site-header,
   main,
   footer { width: min(100% - 64px, 1380px); }
 
@@ -267,16 +278,16 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
   .signal { min-height: 310px; padding: 30px; }
   .today-card { display: flex; flex-direction: column; }
   .today-card .catch-context { margin-top: auto; }
-  .moon-icon { width: 6.5rem; height: 6.5rem; margin-top: 34px; }
+  .moon-icon { width: 6.5rem; height: 6.5rem; }
   .moon-signal strong { font-size: 1.4rem; }
-  .mist-signal { display: flex; flex-direction: column; }
   .mist-reading strong { font-size: 3.4rem; }
-  .mist-meter { width: 140px; margin-top: auto; }
+  .mist-meter { width: 140px; }
   .weather-details { margin-inline: 2px; }
+  .weather-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
   .season-chart { padding: 10px 20px 20px; border-radius: 24px; background: var(--panel-soft); }
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 1280px) {
   .next-days { grid-template-columns: repeat(5, 1fr); }
   .day-card { min-height: 176px; }
 }
@@ -293,7 +304,7 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 .sandbox-mode .catch-value { font-size: clamp(3.5rem, 12vw, 6rem); }
 .sandbox-mode .catch-range { margin-top: 18px; font-size: 0.95rem; }
 .sandbox-mode .catch-context { font-size: 0.78rem; }
-.sandbox-mode .mist-meter { width: 105px; margin-top: 16px; }
+.sandbox-mode .mist-meter { width: 105px; }
 .sandbox-controls { margin-top: 30px; }
 .sandbox-controls h2 { margin: 0; font-family: Georgia, serif; font-size: 2rem; font-weight: 500; }
 .sandbox-intro p, .sandbox-note { color: var(--muted); font-size: 0.85rem; }
@@ -336,7 +347,7 @@ footer { display: flex; align-items: center; justify-content: space-between; gap
 .effect-handle { fill: var(--amber); stroke: var(--night); stroke-width: 2; }
 .effect-hit { fill: transparent; }
 .model-version a { color: var(--cyan); }
-@media (min-width: 1100px) { .scenario-weather { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .scenario-weather { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 639px) {
   .calendar-heading label { flex: 1; min-width: 130px; }
   .calendar-heading select { width: 100%; }
