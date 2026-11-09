@@ -1,0 +1,11 @@
+{
+  "description": "Weather downscaled to the ERA5 training grid elevation, not the ringing site's terrain elevation",
+  "latitude": -3.0,
+  "longitude": 38.25,
+  "surface_geopotential_m2_s2": 7485.0767,
+  "gravity_m_s2": 9.80665,
+  "elevation_m": 763.2654066373,
+  "source": "https://tds.gdex.ucar.edu/thredds/dodsC/files/d633000/e5.oper.invariant/197901/e5.oper.invariant.128_129_z.ll025sc.1979010100_1979010100.nc",
+  "variable": "Z[0][372][153]",
+  "checked_date": "2026-11-09"
+}

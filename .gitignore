@@ -25,6 +25,7 @@ count/intermediate-data/*
 !count/intermediate-data/count_m3b_updated_scores.csv
 !count/intermediate-data/count_weather_scores.csv
 !count/intermediate-data/count_weather_paired.csv
+!count/intermediate-data/elevation_historical_comparison.csv
 mist/intermediate-data/*
 !mist/intermediate-data/scores.csv
 !mist/intermediate-data/fold_scores.csv

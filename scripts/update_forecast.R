@@ -10,7 +10,8 @@ library(here)
 # Set paths and calendar ---------------------------------------------------
 cli_h1("Update Ngulia count and mist forecast")
 count_model <- readRDS(here("count", "model", "model.rds"))
-output_path <- here("site", "data", "forecast.json")
+output_path <- Sys.getenv("NGULIA_FORECAST_OUTPUT", here("site", "data", "forecast.json"))
+weather_reference <- fromJSON(here("raw-data", "weather_reference.json"))
 local_timezone <- "Africa/Nairobi"
 today_local <- as.Date(Sys.time(), tz = local_timezone)
 
@@ -43,6 +44,7 @@ outlook_season_start <- function(today) {
 
 # Fetch one issued ECMWF hourly forecast for both models ------------------
 query <- c(latitude = -3.0142286, longitude = 38.2108675,
+  elevation = weather_reference$elevation_m,
   hourly = paste(c("temperature_2m", "relative_humidity_2m", "dew_point_2m",
     "precipitation", "surface_pressure", "cloud_cover", "cloud_cover_low",
     "wind_speed_10m", "wind_direction_10m"), collapse = ","),
@@ -51,7 +53,7 @@ query <- c(latitude = -3.0142286, longitude = 38.2108675,
 api_url <- paste0("https://api.open-meteo.com/v1/ecmwf?",
   paste(names(query), vapply(query, URLencode, character(1), reserved = TRUE),
     sep = "=", collapse = "&"))
-response <- fromJSON(api_url, simplifyVector = TRUE)
+response <- fromJSON(Sys.getenv("NGULIA_WEATHER_FILE", api_url), simplifyVector = TRUE)
 hourly <- as_tibble(response$hourly) |>
   mutate(datetime = ymd_hm(time, tz = local_timezone),
     weather_valid_date = as.Date(datetime, tz = local_timezone), hour = hour(datetime),
@@ -158,7 +160,10 @@ payload <- list(generated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UT
   demo_mode = FALSE,
   source = list(provider = "Open-Meteo", model = "ECMWF IFS 0.25°",
     endpoint = "https://api.open-meteo.com/v1/ecmwf",
-    latitude = -3.0142286, longitude = 38.2108675, timezone = local_timezone),
+    latitude = -3.0142286, longitude = 38.2108675, timezone = local_timezone,
+    training_reference_elevation_m = weather_reference$elevation_m,
+    elevation_m = response$elevation,
+    weather_reference = weather_reference$description),
   model = c(count_model$training, list(version = "count-m2+mist-cnn-2023-v1",
     count = count_model$version, mist = "mist-cnn-2013-v1",
     response = "Catch conditional on operation and front-bush layout",
